@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {generateInputs, retrieveInputs} = require('../../createInputs');
+const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 
 const inputs = [
     {name: "length", description: "Length of the Ship", type: "Number", required: true},
