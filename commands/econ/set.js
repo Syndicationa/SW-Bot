@@ -3,6 +3,9 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const { handleCurrency } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
+const { log } = require('../../functions/log');
+
+const setLog = log('set');
 
 const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
@@ -11,26 +14,32 @@ const inputs = [
 ]
 
 const runSet = async (interaction) => {
-    const {faction, information, amount} = retrieveInputs(interaction.options, inputs);
+    const arguments = retrieveInputs(interaction.options, inputs);
+    const {faction, information, amount} = arguments;
+
+    let error = '';
     
     if (information !== "inc" && information !== "value") {
-        await interaction.reply(
-            `Remember that income is stored as "inc" and your treasury as "value", ${interaction.user.username}`);
+        error = `Remember that income is stored as "inc" and your treasury as "value", ${interaction.user.username}`;
+        setLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
-
-    console.log(interaction.user);
     const server = interaction.guild.name;
     
     const cost = handleCurrency(amount);
     if (isNaN(cost) || cost === undefined) {
-        await interaction.reply('Error in amount');
+        error = 'Error in amount';
+        setLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 
     const factionData = await getFaction(server, faction);
     if (factionData === undefined) {
-        await interaction.reply('Faction not found');
+        error = 'Faction not found';
+        setLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 

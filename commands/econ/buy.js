@@ -3,6 +3,9 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const { handleCurrency } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
+const { log } = require('../../functions/log');
+
+const buyLog = log('buy')
 
 const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
@@ -11,18 +14,24 @@ const inputs = [
 ]
 
 const runBuy = async (interaction) => {
-    const {faction, items, amount} = retrieveInputs(interaction.options, inputs);
+    const arguments = retrieveInputs(interaction.options, inputs);
+    const {faction, items, amount} = arguments;
     const server = interaction.guild.name;
+    let error = "";
     
     const cost = handleCurrency(amount);
     if (isNaN(cost) || cost === undefined) {
-        await interaction.reply('Error in amount');
+        error = 'Error in amount';
+        buyLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 
     const factionData = await getFaction(server, faction);
     if (factionData === undefined) {
-        await interaction.reply('Faction not found');
+        error = 'Faction not found';
+        buyLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 

@@ -2,6 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 const { handleCurrency } = require('../../functions/currency');
 const { db } = require('../../firebase');
+const { log } = require('../../functions/log');
+
+const transferLog = log('transfer');
 
 const inputs = [
     {name: "source", description: "Source of the money", type: "String", required: true},
@@ -18,21 +21,28 @@ const setFaction = (server, faction, newData) =>
     db.collection(server).doc(faction.toLowerCase()).update(newData);
 
 const runTransfer = async (interaction) => {
-    const {source: s, destination: d, amount} = retrieveInputs(interaction.options, inputs);
+    const arguments = retrieveInputs(interaction.options, inputs);
+    const {source: s, destination: d, amount} = arguments;
     const source = s.toLowerCase();
     const destination = d.toLowerCase();
+
+    let error = '';
 
     const server = interaction.guild.name;
 
     const transferAmount = handleCurrency(amount);
     if (isNaN(transferAmount) || transferAmount === undefined) {
-        await interaction.reply('Error in amount');
+        error = 'Error in amount';
+        setLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 
     const factions = await getFactions(server);
     if (factions.empty) {
-        await interaction.reply('Not in supported server');
+        error = 'Not in supported server';
+        setLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 
@@ -44,7 +54,9 @@ const runTransfer = async (interaction) => {
         if (doc.id === destination) targetDocument = doc.data();
     });
     if (sourceDocument === undefined || targetDocument === undefined) {
-        await interaction.reply('Faction not found');
+        error = 'Faction not found';
+        setLog({arguments, error});
+        await interaction.reply(error);
         return;
     }
 

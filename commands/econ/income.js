@@ -3,6 +3,9 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { db } = require('../../firebase');
+const { log } = require('../../functions/log');
+
+const incomeLog = log('income');
 
 const inputs = [
     {name: "faction", description: "Faction to collect Income", type: "String", required: true},
@@ -24,6 +27,7 @@ const runIncome = async (interaction) => {
 
     const factionData = await getFaction(server, faction.toLowerCase());
     if (factionData === undefined) {
+        incomeLog({arguments: {faction}, error: 'Faction not found'})
         await interaction.reply('Faction not found');
         return;
     }

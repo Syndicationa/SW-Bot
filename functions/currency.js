@@ -2,6 +2,7 @@ const handleCurrency = (input = "") => {
     const trim = input.trim().toLowerCase();
     const letter = trim.slice(-1);
     if (letter === 'l') letter = trim.slice(-3);
+    if (letter === 'ril') letter = trim.slice(-4);
     const numberStr = trim.slice(0,-1*(letter.length));
     let number = Number(numberStr.replace(',','.'));
     let multiplier = 1;

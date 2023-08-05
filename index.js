@@ -3,6 +3,9 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 const { db } = require('./firebase');
+const { saveLogs } = require('./functions/log');
+
+const useLogs = false;
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -57,3 +60,9 @@ client.once(Events.ClientReady, c => {
 
 // Log in to Discord with your client's token
 client.login(token);
+
+process.on('SIGINT',() => {
+    console.log("So long!");
+	saveLogs(useLogs);
+    process.exit()
+});
