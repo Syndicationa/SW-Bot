@@ -33,7 +33,7 @@ const runTransfer = async (interaction) => {
     const transferAmount = handleCurrency(amount);
     if (isNaN(transferAmount) || transferAmount === undefined) {
         error = 'Error in amount';
-        setLog({arguments, error});
+        transferLog({arguments, error});
         await interaction.reply(error);
         return;
     }
@@ -41,7 +41,7 @@ const runTransfer = async (interaction) => {
     const factions = await getFactions(server);
     if (factions.empty) {
         error = 'Not in supported server';
-        setLog({arguments, error});
+        transferLog({arguments, error});
         await interaction.reply(error);
         return;
     }
@@ -55,7 +55,7 @@ const runTransfer = async (interaction) => {
     });
     if (sourceDocument === undefined || targetDocument === undefined) {
         error = 'Faction not found';
-        setLog({arguments, error});
+        transferLog({arguments, error});
         await interaction.reply(error);
         return;
     }
