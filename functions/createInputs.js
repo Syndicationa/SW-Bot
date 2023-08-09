@@ -65,7 +65,8 @@ const retrieveFunction = type => {
 const retrieveInputs = (option, inputArray = exampleInputs) => {
     let output = {};
     inputArray.forEach((input) => {
-        output = {...output, [input.name]: retrieveFunction(input.type)(option, input.name)};
+        const data = retrieveFunction(input.type)(option, input.name);
+        if (data !== null) output = {...output, [input.name]: data};
     })
     return output;
 }

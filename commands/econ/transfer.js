@@ -3,6 +3,7 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const { handleCurrency } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
+const { setFaction, getFaction } = require('../../functions/database');
 
 const transferLog = log('transfer');
 
@@ -12,19 +13,9 @@ const inputs = [
     {name: "amount", description: "Amount of funds(add a m, b, or t as multipliers)", type: "String", required: true},
 ]
 
-const getFactions = async (server) => {
-    const factions = await db.collection(server).get();
-    return factions;
-}
-
-const setFaction = (server, faction, newData) => 
-    db.collection(server).doc(faction.toLowerCase()).update(newData);
-
 const runTransfer = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
-    const {source: s, destination: d, amount} = arguments;
-    const source = s.toLowerCase();
-    const destination = d.toLowerCase();
+    const {source, destination, amount} = arguments;
 
     let error = '';
 
@@ -38,21 +29,9 @@ const runTransfer = async (interaction) => {
         return;
     }
 
-    const factions = await getFactions(server);
-    if (factions.empty) {
-        error = 'Not in supported server';
-        transferLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
+    let sourceDocument = getFaction(server, source);
+    let targetDocument = getFaction(server, destination);
 
-    let sourceDocument;
-    let targetDocument;
-
-    factions.forEach((doc) => {
-        if (doc.id === source) sourceDocument = doc.data();
-        if (doc.id === destination) targetDocument = doc.data();
-    });
     if (sourceDocument === undefined || targetDocument === undefined) {
         error = 'Faction not found';
         transferLog({arguments, error});
@@ -67,7 +46,7 @@ const runTransfer = async (interaction) => {
     const newTargetValue = targetValue + transferAmount;
     setFaction(server, source, {value: newSourceValue});
     setFaction(server, destination, {value: newTargetValue})
-    await interaction.reply(`${s} has sent $${transferAmount} to ${d}`);
+    await interaction.reply(`${source} has sent $${transferAmount} to ${destination}`);
 }
 
 const command = new SlashCommandBuilder().setName('transfer').setDescription('Transfer Money');

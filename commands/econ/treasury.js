@@ -9,9 +9,8 @@ const inputs = [
 const command = new SlashCommandBuilder().setName('treasury').setDescription('Get Treasury');
 generateInputs(command, inputs);
 
-const getFaction = async (server, faction) => {
-    const document = await db.collection(server).doc(faction.toLowerCase()).get();
-    const output = (document.data() ?? {}).value;
+const getF = async (server, faction) => {
+    const output = getFaction(server, faction).value;
     if (faction === "Laro's will to live" || faction.toLowerCase() === "syn") return `does exist`
     return output ? `has $${output}`:`doesn't exist`
 }
@@ -24,7 +23,7 @@ const treasury = {
             message = "I see you Razer"
         }
         const {faction} = retrieveInputs(interaction.options, inputs);
-        const outputValue = await getFaction(interaction.guild.name, faction);
+        const outputValue = await getF(interaction.guild.name, faction);
         await interaction.reply(`${message}\n${faction} ${outputValue}`);
     }
 }

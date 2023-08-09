@@ -4,16 +4,16 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 const { db } = require('./firebase');
 const { saveLogs } = require('./functions/log');
+const { setDatabase } = require('./functions/database');
 
 const useLogs = false;
+console.clear()
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
-
-const information = db.collection('The Solar Wars').doc('milita').get();
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
@@ -57,6 +57,9 @@ client.on(Events.InteractionCreate, async interaction => {
 client.once(Events.ClientReady, c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 });
+
+setInterval(setDatabase, 600000);
+setDatabase();
 
 // Log in to Discord with your client's token
 client.login(token);
