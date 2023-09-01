@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
-const { handleCurrency } = require('../../functions/currency');
+const { handleCurrency, handleReturn } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
@@ -36,8 +36,16 @@ const runBuy = async (interaction) => {
     }
 
     const newValue = factionData.value - cost;
+
+    if (newValue < 0) {
+        error = 'Not enough funds';
+        buyLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
+
     setFaction(server, faction, {value: newValue});
-    await interaction.reply(`${faction} has bought ${items} for $${cost} and now has $${newValue}`);
+    await interaction.reply(`${faction} has bought ${items} for $${handleReturn(cost)} and now has $${handleReturn(newValue)}`);
 }
 
 const command = new SlashCommandBuilder().setName('buy').setDescription('Buy Items');

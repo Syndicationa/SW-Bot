@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
-const { handleCurrency } = require('../../functions/currency');
+const { handleCurrency, handleReturn } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
@@ -44,7 +44,7 @@ const runSet = async (interaction) => {
     }
 
     setFaction(server, faction, {[information]: cost});
-    await interaction.reply(`${faction} has edited ${information} and set it to ${cost}`);
+    await interaction.reply(`${faction} has edited ${information} and set it to ${handleReturn(cost)}`);
 }
 
 const command = new SlashCommandBuilder().setName('set').setDescription('Set Info');

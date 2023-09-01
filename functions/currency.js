@@ -1,5 +1,6 @@
 const handleCurrency = (input = "") => {
     const trim = input.trim().toLowerCase();
+    if (trim === "infinity") return Infinity;
     const letter = trim.slice(-1);
     if (letter === 'l') letter = trim.slice(-3);
     if (letter === 'ril') letter = trim.slice(-4);
@@ -23,4 +24,17 @@ const handleCurrency = (input = "") => {
     return number*multiplier
 }
 
-module.exports = {handleCurrency};
+const reverseString = str => str.split("").reverse().join("");
+
+const handleReturn = (number = 0) => {
+    const reverseSpaced = 
+        reverseString(`${number}`).replace(/([0-9]{3})/g,"$1 ");
+    const pretty = reverseString(reverseSpaced);
+    
+    const suffixes = ['(mil)', '(bil)', '(tril)'];
+    const end = Math.floor(Math.log10(number) / 3) - 2
+    const ending = suffixes[end] ?? '';
+    return `${pretty} ${ending}`
+}
+
+module.exports = {handleCurrency, handleReturn};

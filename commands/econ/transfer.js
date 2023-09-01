@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
-const { handleCurrency } = require('../../functions/currency');
+const { handleCurrency, handleReturn } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
 const { setFaction, getFaction } = require('../../functions/database');
@@ -29,8 +29,15 @@ const runTransfer = async (interaction) => {
         return;
     }
 
-    let sourceDocument = getFaction(server, source);
-    let targetDocument = getFaction(server, destination);
+    let sourceDocument = await getFaction(server, source);
+    let targetDocument = await getFaction(server, destination);
+
+    if (sourceDocument === targetDocument) {
+        error = 'You may not send money to yourself';
+        transferLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
 
     if (sourceDocument === undefined || targetDocument === undefined) {
         error = 'Faction not found';
@@ -43,10 +50,18 @@ const runTransfer = async (interaction) => {
     const targetValue = targetDocument.value;
 
     const newSourceValue = sourceValue - transferAmount;
+
+    if (newSourceValue < 0) {
+        error = 'Not enough funds';
+        transferLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
+
     const newTargetValue = targetValue + transferAmount;
     setFaction(server, source, {value: newSourceValue});
     setFaction(server, destination, {value: newTargetValue})
-    await interaction.reply(`${source} has sent $${transferAmount} to ${destination}`);
+    await interaction.reply(`${source} has sent $${handleReturn(transferAmount)} to ${destination}`);
 }
 
 const command = new SlashCommandBuilder().setName('transfer').setDescription('Transfer Money');

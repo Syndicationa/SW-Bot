@@ -4,6 +4,7 @@ const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
+const { handleReturn } = require('../../functions/currency');
 
 const incomeLog = log('income');
 
@@ -40,7 +41,7 @@ const runIncome = async (interaction) => {
     const newTreasury = treasuryValue + incomeValue*weeks;
     const newTimestamp = Timestamp.fromDate(newDate);
     setFaction(server, faction, {value: newTreasury, date: newTimestamp});
-    await interaction.reply(`${faction} has claimed $${incomeValue*weeks} for ${weeks} week(s) of income`);
+    await interaction.reply(`${faction} has claimed $${handleReturn(incomeValue*weeks)} for ${weeks} week(s) of income`);
 }
 
 const command = new SlashCommandBuilder().setName('income').setDescription('Collect Income');

@@ -40,7 +40,7 @@ const createFaction = (server, faction, data) => {
 }
 
 const deleteFaction = (server, faction) => {
-    database[server][faction.toLowerCase()] = undefined;
+    delete database[server][faction.toLowerCase()]
     db.collection(server).doc(faction.toLowerCase()).delete();
 }
 

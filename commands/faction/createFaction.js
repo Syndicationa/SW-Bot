@@ -20,13 +20,6 @@ const runCreate = async (interaction) => {
     const income = arguments.income ?? "5b";
 
     let error = '';
-    
-    if (information !== "inc" && information !== "value") {
-        error = `Remember that income is stored as "inc" and your treasury as "value", ${interaction.user.username}`;
-        createLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
     const server = interaction.guild.name;
     
     const value = handleCurrency(treasury);

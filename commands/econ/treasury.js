@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 const { db } = require('../../firebase');
+const { getFaction } = require('../../functions/database');
+const { handleReturn } = require('../../functions/currency');
 
 const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
@@ -10,9 +12,9 @@ const command = new SlashCommandBuilder().setName('treasury').setDescription('Ge
 generateInputs(command, inputs);
 
 const getF = async (server, faction) => {
-    const output = getFaction(server, faction).value;
+    const output = await getFaction(server, faction)
     if (faction === "Laro's will to live" || faction.toLowerCase() === "syn") return `does exist`
-    return output ? `has $${output}`:`doesn't exist`
+    return output ? `has $${handleReturn(output.value)}`:`doesn't exist`
 }
 
 const treasury = {
