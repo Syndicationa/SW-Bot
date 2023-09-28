@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
-const { handleCurrency } = require('../../functions/currency');
+const { splitCurrency } = require('../../functions/currency');
 const { getFaction, createFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { Timestamp } = require('firebase-admin/firestore');
@@ -13,6 +13,8 @@ const inputs = [
     {name: "income", description: "The amount of weekly income", type: "String", required: false},
 ]
 
+const createEmptyData = (resources) => resources.reduce((acc, v) => {return {...acc, [v]: 0}},{})
+
 const runCreate = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
     const {faction} = arguments;
@@ -21,11 +23,18 @@ const runCreate = async (interaction) => {
 
     let error = '';
     const server = interaction.guild.name;
+
+    const settings = await getFaction(server, "Settings");
     
-    const value = handleCurrency(treasury);
-    const inc = handleCurrency(income);
-    if (isNaN(value) || value === undefined ||
-        isNaN(inc) || inc === undefined) {
+    const res = splitCurrency(treasury);
+    const inc = splitCurrency(income);
+
+    const NaNRes = res.some((value) => isNaN(value[0]));
+    const NaNInc = inc.some((income) =>isNaN(income[0]))
+    const isResValidType = res.every((value) => settings.Resources.indexOf(value[1]) >= 0)
+    const isIncValidType = inc.every((income) => settings.Resources.indexOf(income[1]) >= 0)
+    if (NaNRes || NaNInc || !isResValidType || !isIncValidType ||
+            res === undefined || inc === undefined) {
         error = 'Error in amount';
         createLog({arguments, error});
         await interaction.reply(error);
@@ -40,7 +49,25 @@ const runCreate = async (interaction) => {
         return;
     }
 
-    createFaction(server, faction, {value, inc, date: Timestamp.fromDate(new Date())});
+    const resources = createEmptyData(settings.Resources);
+    const newResources = {};
+
+    const incomes = createEmptyData(settings.Resources);
+    const newIncomes = {};
+
+    settings.Resources.forEach(async (resourceName) => {
+        const amount = (res.find(arr => arr[1] === resourceName) ?? [0])[0];
+        const income = (inc.find(arr => arr[1] === resourceName) ?? [0])[0];
+
+        newResources[resourceName] = amount;
+        newIncomes[resourceName] = income;
+    })
+
+    createFaction(server, faction, 
+        {Resources: {...resources, ...newResources}, 
+        Income: {...incomes, ...newIncomes}, 
+        Maps: {},
+        date: Timestamp.fromDate(new Date())});
     await interaction.reply(`${faction} has been created`);
 }
 

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
-const { handleCurrency, handleReturn } = require('../../functions/currency');
+const { splitCurrency, handleReturnMultiple } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
 const { setFaction, getFaction } = require('../../functions/database');
@@ -21,8 +21,13 @@ const runTransfer = async (interaction) => {
 
     const server = interaction.guild.name;
 
-    const transferAmount = handleCurrency(amount);
-    if (isNaN(transferAmount) || transferAmount === undefined) {
+    const settings = await getFaction(server, "Settings");
+    
+    const costs = splitCurrency(amount);
+
+    const NaNCosts = costs.some((cost) => isNaN(cost[0]));
+    const isValidType = costs.every((cost) => settings.Resources.indexOf(cost[1]) >= 0)
+    if (NaNCosts || !isValidType || costs === undefined) {
         error = 'Error in amount';
         transferLog({arguments, error});
         await interaction.reply(error);
@@ -46,22 +51,31 @@ const runTransfer = async (interaction) => {
         return;
     }
 
-    const sourceValue = sourceDocument.value;
-    const targetValue = targetDocument.value;
+    const sourceResources = sourceDocument.Resources;
+    const targetResources = targetDocument.Resources;
 
-    const newSourceValue = sourceValue - transferAmount;
+    let newSourceRes = {};
+    let newTargetRes = {};
+    
+    costs.forEach(async (cost) => {
+        const resourceName = cost[1]
+        const amount = cost[0]
+        const nSVal = sourceResources[resourceName] - amount;
+        const nTVal = targetResources[resourceName] + amount;
+        
+        if (nSVal < 0) {
+            error = 'Not enough funds';
+            buyLog({arguments, error});
+            await interaction.reply(error);
+            return;
+        }
 
-    if (newSourceValue < 0) {
-        error = 'Not enough funds';
-        transferLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
-
-    const newTargetValue = targetValue + transferAmount;
-    setFaction(server, source, {value: newSourceValue});
-    setFaction(server, destination, {value: newTargetValue})
-    await interaction.reply(`${source} has sent $${handleReturn(transferAmount)} to ${destination}`);
+        newSourceRes[resourceName] = nSVal;
+        newTargetRes[resourceName] = nTVal;
+    })
+    setFaction(server, source, {Resources: {...sourceResources, ...newSourceRes}});
+    setFaction(server, destination, {Resources: {...targetResources, ...newTargetRes}})
+    await interaction.reply(`${source} has sent to ${destination}: ${handleReturnMultiple(costs)}`);
 }
 
 const command = new SlashCommandBuilder().setName('transfer').setDescription('Transfer Money');

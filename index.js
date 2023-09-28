@@ -4,7 +4,7 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 const { db } = require('./firebase');
 const { saveLogs } = require('./functions/log');
-const { setDatabase } = require('./functions/database');
+const { setDatabase, printDatabase } = require('./functions/database');
 
 const useLogs = false;
 console.clear()
@@ -66,6 +66,7 @@ client.login(token);
 
 process.on('SIGINT',() => {
     console.log("So long!");
+	console.log(printDatabase());
 	saveLogs(useLogs);
     process.exit()
 });

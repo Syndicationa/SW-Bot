@@ -4,7 +4,8 @@ const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
-const { handleReturn } = require('../../functions/currency');
+const {handleReturnMultiple } = require('../../functions/currency');
+const {objectMap} = require('../../functions/functions');
 
 const incomeLog = log('income');
 
@@ -26,6 +27,8 @@ const runIncome = async (interaction) => {
     const {faction} = retrieveInputs(interaction.options, inputs);
     const server = interaction.guild.name;
 
+    const settings = await getFaction(server, "Settings");
+
     const factionData = await getFaction(server, faction.toLowerCase());
     if (factionData === undefined) {
         incomeLog({arguments: {faction}, error: 'Faction not found'})
@@ -33,15 +36,21 @@ const runIncome = async (interaction) => {
         return;
     }
 
-    const treasuryValue = factionData.value;
-    const incomeValue = factionData.inc;
+    const resources = factionData.Resources;
     const lastDate = factionData.date.toDate();
 
     const {weeks, date: newDate} = updateDate(lastDate);
-    const newTreasury = treasuryValue + incomeValue*weeks;
+
+    const income = objectMap(factionData.Income, inc => inc*weeks);
+
+    const newResources = objectMap(resources, 
+        (resource, name) => resource + income[name]
+    );
     const newTimestamp = Timestamp.fromDate(newDate);
-    setFaction(server, faction, {value: newTreasury, date: newTimestamp});
-    await interaction.reply(`${faction} has claimed $${handleReturn(incomeValue*weeks)} for ${weeks} week(s) of income`);
+    setFaction(server, faction, {Resources: newResources, date: newTimestamp});
+    await interaction.reply(
+        `${faction} has claimed ${handleReturnMultiple(income, settings.Resources)} for ${weeks} week(s) of income`
+    );
 }
 
 const command = new SlashCommandBuilder().setName('income').setDescription('Collect Income');

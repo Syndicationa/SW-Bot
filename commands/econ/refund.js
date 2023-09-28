@@ -5,17 +5,15 @@ const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 
-const buyLog = log('buy')
+const refundLog = log('refund')
 
 const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
     {name: "items", description: "Items to be bought", type: "String", required: true},
-    {name: "amount", 
-        description: "Amount of funds(add a m, b, or t as multipliers). Use | + or ; to separate funds", 
-        type: "String", required: true},
+    {name: "amount", description: "Amount of funds(add a m, b, or t as multipliers)", type: "String", required: true},
 ]
 
-const runBuy = async (interaction) => {
+const runRefund = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
     const {faction, items, amount} = arguments;
     const server = interaction.guild.name;
@@ -29,7 +27,7 @@ const runBuy = async (interaction) => {
     const isValidType = costs.every((cost) => settings.Resources.indexOf(cost[1]) >= 0)
     if (NaNCosts || !isValidType || costs === undefined) {
         error = 'Error in amount';
-        buyLog({arguments, error});
+        refundLog({arguments, error});
         await interaction.reply(error);
         return;
     }
@@ -37,7 +35,7 @@ const runBuy = async (interaction) => {
     const factionData = await getFaction(server, faction);
     if (factionData === undefined) {
         error = 'Faction not found';
-        buyLog({arguments, error});
+        refundLog({arguments, error});
         await interaction.reply(error);
         return;
     }
@@ -48,11 +46,11 @@ const runBuy = async (interaction) => {
     costs.forEach(async (cost) => {
         const resourceName = cost[1]
         const amount = cost[0]
-        const nVal = resources[resourceName] - amount;
+        const nVal = resources[resourceName] + amount;
         
         if (nVal < 0) {
             error = 'Not enough funds';
-            buyLog({arguments, error});
+            refundLog({arguments, error});
             await interaction.reply(error);
             return;
         }
@@ -62,16 +60,16 @@ const runBuy = async (interaction) => {
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
     await interaction.reply(
-        `${faction} has bought ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
+        `${faction} has refunded ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
     );
 }
 
-const command = new SlashCommandBuilder().setName('buy').setDescription('Buy Items');
+const command = new SlashCommandBuilder().setName('refund').setDescription('Refund Items');
 generateInputs(command, inputs);
 
-const buy = {
+const refund = {
     data: command,
-    execute: runBuy
+    execute: runRefund
 }
 
-module.exports = buy;
+module.exports = refund;

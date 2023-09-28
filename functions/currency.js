@@ -1,3 +1,18 @@
+const splitCurrency = (input = "", def = "ER") => {
+    const trim = input.trim();
+    let split = trim.split("|");
+    split = split.flatMap((str) => str.split("+"));
+    split = split.flatMap((str) => str.split(";"));
+    split = split.map((str) => str.trim().split(" "));
+    split = split.map((arr) => 
+        arr.length === 1 ? 
+            [arr[0], def.toUpperCase()]:
+            [arr[0], arr[1].toUpperCase()]);
+    split = split.map(arr => [handleCurrency(arr[0]), arr[1]])
+
+    return split;
+}
+
 const handleCurrency = (input = "") => {
     const trim = input.trim().toLowerCase();
     if (trim === "infinity") return Infinity;
@@ -26,6 +41,24 @@ const handleCurrency = (input = "") => {
 
 const reverseString = str => str.split("").reverse().join("");
 
+const resourceArrayToObject = (arr) => 
+    arr.reduce((acc, v) => {
+        return {...acc, [v[1]]: v[0]}
+    },{})
+
+const handleReturnMultiple = (obj, order = undefined) => { 
+    if (Array.isArray(obj)) 
+        return handleReturnMultiple(resourceArrayToObject(obj));
+
+    console.log(obj);
+    
+    let source = order === undefined ? Object.keys(obj):order;
+    
+    return source.map(
+        (str) => `${handleReturn(obj[str]).trim()} ${str}`
+    ).join("\n");
+}
+
 const handleReturn = (number = 0) => {
     const reverseSpaced = 
         reverseString(`${number}`).replace(/([0-9]{3})/g,"$1 ");
@@ -37,4 +70,7 @@ const handleReturn = (number = 0) => {
     return `${pretty} ${ending}`
 }
 
-module.exports = {handleCurrency, handleReturn};
+
+//console.log(splitCurrency("20b EM; 320m PM + 20 NM"));
+
+module.exports = {splitCurrency, handleCurrency, handleReturnMultiple, handleReturn};
