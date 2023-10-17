@@ -20,14 +20,14 @@ generateInputs(command, inputs);
 const rateFunction = (values) => {
     const {length, main, secondary, lances, pdc, torpedoes, hangar, shield, stealth, other} = values;
     const lCost = length*(24 + (stealth ? 2: 0));
-    const mCost = main*15 ?? 0;
-    const seCost = secondary*10 ?? 0;
-    const lanCost = lances*50 ?? 0;
-    const pCost = pdc*5 ?? 0;
-    const tCost = torpedoes*5 ?? 0;
-    const hCost = hangar*125 ?? 0;
+    const mCost = (main ?? 0)*15;
+    const seCost = (secondary ?? 0)*10;
+    const lanCost = (lances ?? 0)*50;
+    const pCost = (pdc ?? 0)*5;
+    const tCost = (torpedoes ?? 0)*5;
+    const hCost = (hangar ?? 0);
     const oCost = other ?? 0;
-    const sCost = shield ? 300:0;
+    const sCost = (shield ?? false) ? 300:0;
     const cost = lCost + mCost + seCost + lanCost + pCost + tCost + hCost + sCost + oCost;
     return cost/1000;
 }

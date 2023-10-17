@@ -33,7 +33,7 @@ const runNations = async (interaction) => {
     const {type} = retrieveInputs(interaction.options, inputs);
     try {
         const f = factionQualities(type);
-        const outputValue = getFactionNames(interaction.guild.name, f).reduce((str, v) => `${str}${v}\n`, "");
+        const outputValue = getFactionNames(interaction.guild.name, f).join("\n");
         await interaction.reply(`${outputValue}`);
     } catch (e) {
         let err = "Invalid Quality"

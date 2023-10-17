@@ -31,8 +31,10 @@ const handleCurrency = (input = "") => {
             multiplier *= 1000;
         case 'm':
         case 'mil':
-            multiplier *= 1000000;
-        break;
+            multiplier *= 1000;
+        case 'k':
+            multiplier *= 1000;
+            break;
         default:
             number = number*10 + Number(letter);
     }
