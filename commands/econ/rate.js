@@ -42,7 +42,6 @@ const rateFunction = (values) => {
 	const sysCost = (systems ?? 0) * length;
 
     const engineCounts = splitCurrency(engines, "M");
-    console.log(engineCounts);
     const engineCosts = {S: 5.5, M: 7.5, L: 10.5};
     const engineCost = engineCounts.reduce((acc, [count, type]) => 
         (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);

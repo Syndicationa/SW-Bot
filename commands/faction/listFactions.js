@@ -21,7 +21,7 @@ const factionQualities = quality => {
         case "hasIncome":
             return (_, d) => d.inc !== undefined;
         case "noIncome":
-            return (_, d) => d.inc === undefined;
+            return (_, d) => d.inc ===   undefined;
         case undefined:
             return () => true;
         default:

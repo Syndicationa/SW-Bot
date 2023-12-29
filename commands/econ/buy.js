@@ -21,6 +21,13 @@ const runBuy = async (interaction) => {
     const server = interaction.guild.name;
     let error = "";
 
+    if (interaction.user.username === "mwrazer") {
+        await interaction.reply(
+            `${faction} has not bought ${items}`
+        );
+        return;
+    };
+
     const settings = await getFaction(server, "Settings");
     
     const costs = splitCurrency(amount);

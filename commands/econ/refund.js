@@ -15,6 +15,7 @@ const inputs = [
 
 const runRefund = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
+    if (interaction.user.username === "mwrazer") return;
     const {faction, items, amount} = arguments;
     const server = interaction.guild.name;
     let error = "";
