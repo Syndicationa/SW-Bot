@@ -7,10 +7,14 @@ const { log } = require('../../functions/log');
 const {handleReturnMultiple } = require('../../functions/currency');
 const {objectMap} = require('../../functions/functions');
 
-const incomeLog = log('income');
+const incomeLog = log('incomehex');
 
 const inputs = [
     {name: "faction", description: "Faction to collect Income", type: "String", required: true},
+	{name: "age", description: "Faction age", type: "Integer", required: true},
+	{name: "crafts", description: "Total military crafts owned", type: "Integer", required: true},
+	{name: "popchange", description: "Total military crafts owned", type: "Integer", required: true},
+	{name: "size", description: "Number of hexes banked", type: "Integer", required: true},
 ]
 
 const week = (7 * 24 * 60 * 60 * 1000);
@@ -23,7 +27,7 @@ const updateDate = (LastUpdated = new Date()) => {
 	return {weeks, date: updateDay};
 }
 
-const runIncome = async (interaction) => {
+const runIncomehex = async (interaction) => {
     const {faction} = retrieveInputs(interaction.options, inputs);
     const server = interaction.guild.name;
 
@@ -53,12 +57,12 @@ const runIncome = async (interaction) => {
 	await interaction.reply({ embeds: [ embed ] });
 }
 
-const command = new SlashCommandBuilder().setName('income').setDescription('Collect Income');
+const command = new SlashCommandBuilder().setName('incomehex').setDescription('text broken');
 generateInputs(command, inputs);
 
-const income = {
+const incomehex = {
     data: command,
-    execute: runIncome
+    execute: runIncomehex
 }
 
-module.exports = income;
+module.exports = incomehex;

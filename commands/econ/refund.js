@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 const { splitCurrency, handleReturnMultiple } = require('../../functions/currency');
 const { db } = require('../../firebase');
@@ -15,7 +15,6 @@ const inputs = [
 
 const runRefund = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
-    if (interaction.user.username === "mwrazer") return;
     const {faction, items, amount} = arguments;
     const server = interaction.guild.name;
     let error = "";
@@ -60,9 +59,9 @@ const runRefund = async (interaction) => {
     })
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
-    await interaction.reply(
-        `${faction} has refunded ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
-    );
+	const embed = new EmbedBuilder().setTitle(`Refund`).setColor(0x0099FF).setDescription(
+		`${faction} has refunded: \n${items} \n\nfor $${handleReturnMultiple(costs, settings.Resources)}.`);
+	await interaction.reply({ embeds: [ embed ] });
 }
 
 const command = new SlashCommandBuilder().setName('refund').setDescription('Refund Items');

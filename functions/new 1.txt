@@ -1,0 +1,805 @@
+Faction: 11
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 19167000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705708800, _nanoseconds: 928000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 17678500000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: 5th empire
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 50000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1697324400, _nanoseconds: 882000000 }
+}
+Faction: afgc
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 13491000000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: arestika
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705881600, _nanoseconds: 678000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 1471203334000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: athena
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705881600, _nanoseconds: 714000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 2789501000000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: daf
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 135685000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 4412723499998,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1686610800, _nanoseconds: 419000000 }
+}
+Faction: demterra
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705276800, _nanoseconds: 533000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5664627999000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: dummy
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1703980800, _nanoseconds: 148000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 54200000000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: enclave
+{
+  date: Timestamp { _seconds: 1705268957, _nanoseconds: 558000000 },
+  Maps: {},
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    'unrefined cm': 0,
+    influence: 0,
+    ER: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    'unrefined cm': 0,
+    influence: 0,
+    ER: 0
+  }
+}
+Faction: est
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705622400, _nanoseconds: 477000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 4727494999960,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: gh
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 50000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1701475200, _nanoseconds: 662000000 }
+}
+Faction: hausteria
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705795200, _nanoseconds: 410000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 14061620499960,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: jovian
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705795200, _nanoseconds: 634000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 8367112437280,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: kkw
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705708800, _nanoseconds: 457000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 151188999990,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: lter
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 59513200000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1696978800, _nanoseconds: 241000000 }
+}
+Faction: mcr
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705795200, _nanoseconds: 608000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 28877851928603,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: milita
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705186800, _nanoseconds: 762000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 11380910000000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: new spain
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 50000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1701475200, _nanoseconds: 626000000 }
+}
+Faction: nexus federation
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 24800000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 57994000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1696978800, _nanoseconds: 578000000 }
+}
+Faction: piratetest
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: raptoria
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1704240000, _nanoseconds: 790000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 20279931700000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: raze
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705708800, _nanoseconds: 959000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 8942026999669,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: rwg
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1690930800, _nanoseconds: 403000000 }
+}
+Faction: scrapiracy
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: settings
+{
+  PlaceList: [ 'Mercury' ],
+  Date: {},
+  DefaultResource: 'ER',
+  Places: { Mercury: { Size: 4214, Claimed: 100, ResourceIncome: [Object] } },
+  Resources: [
+    'ER',
+    'cm',
+    'consumables',
+    'eletronics',
+    'influence',
+    'unrefined cm',
+    'unrefined consumables',
+    'unrefined eletronics'
+  ]
+}
+Faction: solflamme
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: sushihouse
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705622400, _nanoseconds: 860000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 1122500000000,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: tank
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 35000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 50000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1702598400, _nanoseconds: 710000000 }
+}
+Faction: tempestas
+{
+  Maps: {},
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 94400000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1705794853, _nanoseconds: 927000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 53249977877,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: test
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 0,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: uefb
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1704758400, _nanoseconds: 722000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 28651252779607,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: uf
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 250000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1704499200, _nanoseconds: 912000000 },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 1290158000001,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: void
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: Infinity,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: Infinity,
+    'unrefined cm': 0,
+    influence: 0
+  }
+}
+Faction: wingyu687
+{
+  Income: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 5000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  Resources: {
+    eletronics: 0,
+    consumables: 0,
+    'unrefined eletronics': 0,
+    cm: 0,
+    'unrefined consumables': 0,
+    ER: 50000000000,
+    'unrefined cm': 0,
+    influence: 0
+  },
+  date: Timestamp { _seconds: 1701475200, _nanoseconds: 220000000 }
+}

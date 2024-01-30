@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 const { splitCurrency, handleReturnMultiple } = require('../../functions/currency');
 const { db } = require('../../firebase');
@@ -20,13 +20,6 @@ const runBuy = async (interaction) => {
     const {faction, items, amount} = arguments;
     const server = interaction.guild.name;
     let error = "";
-
-    if (interaction.user.username === "mwrazer") {
-        await interaction.reply(
-            `${faction} has not bought ${items}`
-        );
-        return;
-    };
 
     const settings = await getFaction(server, "Settings");
     
@@ -70,9 +63,9 @@ const runBuy = async (interaction) => {
     if (Object.keys(newResources).length !== Object.keys(costs).length) return;
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
-    await interaction.reply(
-        `${faction} has bought ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
-    );
+	const embed = new EmbedBuilder().setTitle(`Purchase`).setColor(0x0099FF).setDescription(
+		`${faction} has bought: \n${items} \n\nfor $${handleReturnMultiple(costs, settings.Resources)}.`);
+	await interaction.reply({ embeds: [ embed ] });
 }
 
 const command = new SlashCommandBuilder().setName('buy').setDescription('Buy Items');

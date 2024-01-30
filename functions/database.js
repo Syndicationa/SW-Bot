@@ -89,50 +89,121 @@ const deletePlace = (server, place) => {
     serverDB.doc("settings").set(serverData.settings);
 }
 
-module.exports = {getFaction, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace}
-
 const run = async () => {
     await setDatabase();
     printDatabase();
 
-    const er = {afgc: 1321400000000 + 255000000000,
-        arestika: 40000000 + (168515000000 * 2),
-        athena: 3836393999958,
+    const er = {'11': 17678500000,
+		'5th empire': 50000000000,
+		afgc: 13491000000,
+        arestika: 1471203334000,
+        athena: 2789501000000,
         daf: 4412723499998,
-        demterra: 1256628000000,
-        enclave: 6469450000000,
-        est: 4114679000000,
-        hausteria: 3795449999960,
-        jovian: 5155474787280,
-        kkw: 97625000000 + (17225000000 * 2),
-        mcr: 29276036964420 + 250000000000,
-        milita: 2080920000000 - 70000000000,
-        raptoria: 29929931700000 - 150000000000,
-        raze: 2337626999769,
+        demterra: 5664627999000,
+		dummy: 0,
+		enclave: 0,
+        est: 4727494999960,
+		gh: 50000000000,
+        hausteria: 14061620499960,
+        jovian: 8367112437280,
+        kkw: 151188999990,
+		lter: 59513200000,
+        mcr: 28877851928603,
+        milita: 11380910000000,
+		'new spain': 50000000000,
+		'nexus federation': 57994000000,
+		piratetest: 0,
+        raptoria: 20279931700000,
+        raze: 8942026999669,
         rwg:0,
         scrapiracy: 0,
         solflamme: 0,
-        sushihouse: 1679249977865,
+        sushihouse: 1122500000000,
+		tank: 50000000000,
+		tempestas: 53249977877,
         test: 0,
-        uefb: 30878152779607,
-        uf: 11830000000 + 249600000000,
-        void: Infinity
+        uefb: 28651252779607,
+        uf: 1290158000001,
+        void: Infinity,
+		wingyu687: 50000000000
         }
-
+	const ir = {'11': 19167000000,
+		'5th empire': 5000000000,
+		afgc: 0,
+        arestika: 250000000000,
+        athena: 250000000000,
+        daf: 135685000000,
+        demterra: 250000000000,
+		dummy: 54200000000,
+		enclave: 0,
+        est: 250000000000,
+		gh: 5000000000,
+        hausteria: 250000000000,
+        jovian: 250000000000,
+        kkw: 250000000000,
+		lter: 5000000000,
+        mcr: 250000000000,
+        milita: 250000000000,
+		'new spain': 5000000000,
+		'nexus federation': 24800000000,
+		piratetest: 0,
+        raptoria: 250000000000,
+        raze: 250000000000,
+        rwg:5000000000,
+        scrapiracy: 250000000000,
+        solflamme: 250000000000,
+        sushihouse: 250000000000,
+		tank: 35000000000,
+		tempestas: 94400000000,
+        test: 5000000000,
+        uefb: 250000000000,
+        uf: 250000000000,
+        void: Infinity,
+		wingyu687: 5000000000
+        }
+	
     serverDB = database["The Solar Wars"];
 
     Object.keys(serverDB).forEach((factionName) => {
-        const err = er[factionName]
+        const err = er[factionName];
+		console.log(err);
+		const irr = ir[factionName];
         if (factionName === "settings") return;
         setFaction("The Solar Wars", factionName, 
         {
             Resources: {
                 ER: err,
-                CM: 0,
-                EM: 0,
-                NM: 0,
-                PM: 0
-            }
+                cm: [0,0],
+                electronics: [0,0],
+                consumables: [0,0],
+				influence: [0,0],
+				'unrefined cm': [0,0],
+				'unrefined consumables': [0,0],
+				'unrefined electronics': [0,0]
+
+            }, 
+			Income: {
+                ER: irr,
+                cm: 0,
+                electronics: 0,
+                consumables: 0,
+				influence: 0,
+				'unrefined cm': 0,
+				'unrefined consumables': 0,
+				'unrefined electronics': 0
+            },
+			MissionSlots: {
+				1: [0,0,0,0],
+				2: [0,0,0,0],
+				3: [0,0,0,0],
+				4: [0,0,0,0],
+				5: [0,0,0,0],
+			},
         })
+		
     })
 }
+
+module.exports = {getFaction, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace, run}
+
+
