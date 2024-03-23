@@ -63,11 +63,14 @@ const runCreate = async (interaction) => {
         newIncomes[resourceName] = income;
     })
 
+    const now = new Date();
+    now.setUTCHours(0,0,0,0);
+
     createFaction(server, faction, 
         {Resources: {...resources, ...newResources}, 
         Income: {...incomes, ...newIncomes}, 
         Maps: {},
-        date: Timestamp.fromDate(new Date())});
+        date: Timestamp.fromDate(now)});
     await interaction.reply(`${faction} has been created`);
 }
 
