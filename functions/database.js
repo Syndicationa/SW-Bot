@@ -91,48 +91,13 @@ const deletePlace = (server, place) => {
 
 module.exports = {getFaction, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace}
 
+const fs = require('node:fs');
+
 const run = async () => {
     await setDatabase();
+    
+    const fileName = `./database.txt`
+    fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
+
     printDatabase();
-
-    const er = {afgc: 1321400000000 + 255000000000,
-        arestika: 40000000 + (168515000000 * 2),
-        athena: 3836393999958,
-        daf: 4412723499998,
-        demterra: 1256628000000,
-        enclave: 6469450000000,
-        est: 4114679000000,
-        hausteria: 3795449999960,
-        jovian: 5155474787280,
-        kkw: 97625000000 + (17225000000 * 2),
-        mcr: 29276036964420 + 250000000000,
-        milita: 2080920000000 - 70000000000,
-        raptoria: 29929931700000 - 150000000000,
-        raze: 2337626999769,
-        rwg:0,
-        scrapiracy: 0,
-        solflamme: 0,
-        sushihouse: 1679249977865,
-        test: 0,
-        uefb: 30878152779607,
-        uf: 11830000000 + 249600000000,
-        void: Infinity
-        }
-
-    serverDB = database["The Solar Wars"];
-
-    Object.keys(serverDB).forEach((factionName) => {
-        const err = er[factionName]
-        if (factionName === "settings") return;
-        setFaction("The Solar Wars", factionName, 
-        {
-            Resources: {
-                ER: err,
-                CM: 0,
-                EM: 0,
-                NM: 0,
-                PM: 0
-            }
-        })
-    })
 }

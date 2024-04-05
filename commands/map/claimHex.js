@@ -46,11 +46,17 @@ const runClaim = async (interaction) => {
         return;
     }
 
-    const newMaps = {...factionData.Maps, [place]: factionData.Maps[place] ?? 0 + count};
+    const newMaps = {
+        ...factionData.Maps, 
+        [place]: {
+            Buildings: [],
+            Fleets: [],
+            ...(factionData.Maps[place] ?? {}),
+            Hexes: (factionData.Maps[place]?.Hexes ?? 0) + count,
+        }
+    };
 
-    const newIncome = updateIncome(factionData, newMaps, settings.Places);
-
-    setFaction(server, faction, {Maps: newMaps, Income: newIncome});
+    setFaction(server, faction, {Maps: newMaps});
     claimPlace(server, place, count);
     await interaction.reply(`${faction} has claimed ${count} on ${place}`);
 }

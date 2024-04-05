@@ -61,13 +61,26 @@ const runCreate = async (interaction) => {
 
         newResources[resourceName] = amount;
         newIncomes[resourceName] = income;
-    })
+    });
 
-    createFaction(server, faction, 
-        {Resources: {...resources, ...newResources}, 
-        Income: {...incomes, ...newIncomes}, 
-        Maps: {},
-        date: Timestamp.fromDate(new Date())});
+    const genericPlanet = {
+        Hexes: 0,
+        Buildings: [],
+        Fleets: [],
+    }
+    const genericMaps = settings.PlaceList.reduce((acc, v) => {return {...acc, [v]: genericPlanet}},{});
+
+    createFaction(server, faction, {
+        Resources: {...resources, ...newResources}, 
+        Income: {...incomes, ...newIncomes},
+        Storage: incomes, 
+        Maps: genericMaps,
+        date: Timestamp.fromDate(new Date()),
+        Vehicles: [],
+        Buildings: [],
+        Fleets: [],
+        Missions: []
+    });
     await interaction.reply(`${faction} has been created`);
 }
 

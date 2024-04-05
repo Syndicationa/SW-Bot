@@ -48,17 +48,17 @@ const resourceArrayToObject = (arr) =>
         return {...acc, [v[1]]: v[0]}
     },{})
 
-const handleReturnMultiple = (obj, order = undefined) => { 
+const handleReturnMultiple = (obj, order = undefined, join = "\n") => { 
     if (Array.isArray(obj)) 
         return handleReturnMultiple(resourceArrayToObject(obj));
 
     console.log(obj);
     
-    let source = order === undefined ? Object.keys(obj):order;
+    let source = order ?? Object.keys(obj);
     
     return source.map(
         (str) => `${handleReturn(obj[str]).trim()} ${str}`
-    ).join("\n");
+    ).join(join);
 }
 
 const handleReturn = (number = 0) => {
