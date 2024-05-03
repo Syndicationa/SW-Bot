@@ -3,7 +3,10 @@ const exampleInputs = [
         name: "Type",
         description: "Does something",
         type: "String",
-        required: false
+        required: false,
+        choices: [
+            {name: "A", value: "A"}
+        ]
     }
 ];
 
@@ -30,8 +33,11 @@ const typeFunction = type => {
     }
 }
 
-const optionFunction = (data = exampleInputs[0]) => 
-    option => option.setName(data.name).setDescription(data.description).setRequired(data.required);
+const optionFunction = (data = exampleInputs[0]) => option => {
+    option.setName(data.name).setDescription(data.description).setRequired(data.required)
+    if (Array.isArray(data.choices)) option.addChoices(...data.choices)
+    return option;
+};
 
 const generateInputs = (command, inputArray = exampleInputs) => {
     inputArray.forEach((input) => {

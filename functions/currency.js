@@ -1,22 +1,19 @@
 const splitCurrency = (input = "", def = "ER") => {
     const trim = input.trim();
-    let split = trim.split("|");
-    split = split.flatMap((str) => str.split("+"));
-    split = split.flatMap((str) => str.split(";"));
-    split = split.map((str) => str.trim().split(" "));
-    split = split.map((arr) => 
-        arr.length === 1 ? 
-            [arr[0], def.toUpperCase()]:
-            [arr[0], arr[1].toUpperCase()]);
-    split = split.map(arr => [handleCurrency(arr[0]), arr[1]])
+    let result = trim.match(/\d+(k|[mb](il)?|t(ril)?)?[^\d+|;]*/g).map(stri => {
+        const str = stri.trim();
+        const number = str.match(/\d+(k|[mb](il)?|t(ril)?)?/g)[0];
+        const resource = str.split(number).slice(-1)[0].trim();
+        return [handleCurrency(number), resource === "" ? def:resource];
+        });
 
-    return split;
+    return result;
 }
 
 const handleCurrency = (input = "") => {
     const trim = input.trim().toLowerCase();
     if (trim === "infinity") return Infinity;
-    const letter = trim.slice(-1);
+    let letter = trim.slice(-1);
     if (letter === 'l') letter = trim.slice(-3);
     if (letter === 'ril') letter = trim.slice(-4);
     const numberStr = trim.slice(0,-1*(letter.length));
