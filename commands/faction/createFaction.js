@@ -18,7 +18,7 @@ const createEmptyData = (resources) => resources.reduce((acc, v) => {return {...
 const runCreate = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
     const {faction} = arguments;
-    const treasury = arguments.treasury ?? "50b";
+    const treasury = arguments.treasury ?? "50b 40m Population";
     const income = arguments.income ?? "5b";
 
     let error = '';
@@ -70,12 +70,14 @@ const runCreate = async (interaction) => {
     }
     const genericMaps = settings.PlaceList.reduce((acc, v) => {return {...acc, [v]: genericPlanet}},{});
 
+    const today = new Date();
+
     createFaction(server, faction, {
         Resources: {...resources, ...newResources}, 
         Income: {...incomes, ...newIncomes},
         Storage: incomes, 
         Maps: genericMaps,
-        date: Timestamp.fromDate(new Date()),
+        date: Timestamp.fromDate(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))),
         Vehicles: [],
         Buildings: [],
         Fleets: [],

@@ -41,6 +41,14 @@ const runIncome = async (interaction) => {
 
     const {weeks, date: newDate} = updateDate(lastDate);
 
+    if (weeks === 0) {
+        const nextDate = new Date(lastDate.getTime() + week);
+        await interaction.reply(
+            `${faction} will be able to claim income on ${nextDate.getUTCFullYear()}/${nextDate.getUTCMonth()+1}/${nextDate.getUTCDate()}`
+        );
+        return
+    }
+
     const income = objectMap(factionData.Income, inc => inc*weeks);
 
     const newResources = objectMap(resources, 

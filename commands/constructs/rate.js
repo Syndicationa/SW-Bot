@@ -163,7 +163,7 @@ const rateFunction = (values) => {
     const correctedCargo = cargo ?? 0;
     const correctedDrone = drone ?? false;
 
-    const correctedEngines = splitCurrency(engines, "M");
+    const correctedEngines = splitCurrency(engines ?? "0", "M");
 
     const correctedValues = {
         length,
