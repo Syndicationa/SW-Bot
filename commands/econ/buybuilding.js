@@ -48,11 +48,10 @@ const runBuy = async (interaction) => {
         await interaction.reply(error);
     }
 
-    const costs = objectMap(factionData.Buildings[index], (n) => n*amount);
+    const costs = objectMap(factionData.Buildings[index].cost, (n) => n*amount);
 
-    const NaNCosts = costs.some((cost) => isNaN(cost[0]));
-    const isValidType = costs.every((cost) => settings.Resources.indexOf(cost[1]) >= 0)
-    if (NaNCosts || !isValidType || costs === undefined) {
+    const NaNCosts = Object.keys(costs).some((res) => isNaN(costs[res]));
+    if (NaNCosts || costs === undefined) {
         error = 'Error in cost';
         buyLog({arguments, error});
         await interaction.reply(error);
@@ -60,24 +59,35 @@ const runBuy = async (interaction) => {
     }
 
     const resources = factionData.Resources;
-    const newResources = {};
+    
+    const newResources = 
+        objectMap(resources,
+            (count, res) => {
+            const nVal = count - costs[res];
+            
+            if (count >= 0 && nVal < 0 && error === "") {
+                error = 'Not enough funds';
+            }
 
-    costs.forEach(async (cost) => {
-        const resourceName = cost[1]
-        const amount = cost[0]
-        const nVal = resources[resourceName] - amount;
-        
-        if (nVal < 0) {
-            error = 'Not enough funds';
-            buyLog({arguments, error});
-            await interaction.reply(error);
-            return;
-        }
+            return nVal;
+        })
 
-        newResources[resourceName] = nVal;
-    })
+    if (error !== "") {
+        buyLog({arguments, error});
+        await interaction.reply(error);
+    }
 
     if (Object.keys(newResources).length !== Object.keys(costs).length) return;
+
+    const oldBuilding = place.Buildings[index] ?? {};
+
+    const newBuilding = {
+        ...oldBuilding,
+        "0": (oldBuilding["0"] ?? 0) + 1
+    }
+
+    const newBuildings = place.Buildings;
+    newBuildings[index] = newBuilding;
 
     const newMaps = {
         ...factionData.Maps,
@@ -85,19 +95,16 @@ const runBuy = async (interaction) => {
             Fleets: [],
             Hexes: 0,
             ...(place ?? {}),
-            Buildings: [
-                ...place.Buildings.slice(0, index), 
-                place.Buildings[index] + amount,
-                ...place.Buildings.slice(index + 1)
-            ],
+            Buildings: newBuildings,
         }
     }
 
-
+    console.log(newResources);
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
+    setFaction(server, faction, {Maps: newMaps});
     await interaction.reply(
-        `${faction} has bought ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
+        `${faction} has bought ${amount} ${factionData.Buildings[index].name} for $${handleReturnMultiple(costs, settings.Resources)}`
     );
 }
 

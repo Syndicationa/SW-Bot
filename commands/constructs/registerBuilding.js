@@ -3,7 +3,7 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { log } = require('../../functions/log');
-const { splitCurrency } = require('../../functions/currency');
+const { splitCurrency, convertToObject } = require('../../functions/currency');
 const { objectMap } = require('../../functions/functions');
 
 const regBLog = log('registerBuidling');
@@ -22,6 +22,7 @@ const runRegisterBuilding = async (interaction) => {
     const {faction, name, cost, income, year, month, day} = retrieveInputs(interaction.options, inputs);
     const server = interaction.guild.name;
 
+    const settings = await getFaction(server, "settings");
     const factionData = await getFaction(server, faction.toLowerCase());
     if (factionData === undefined) {
         regBLog({arguments: {faction}, error: 'Faction not found'})
@@ -44,7 +45,7 @@ const runRegisterBuilding = async (interaction) => {
         return;
     }
 
-    const calcIncomes = objectMap(splitCurrency(income), (n) => n/100);
+    const calcIncomes = splitCurrency(income);
 
     const NaNIncomes = calcCosts.some((cost) => isNaN(cost[0]));
     const isValidTypeIncome = calcCosts.every((cost) => settings.Resources.indexOf(cost[1]) >= 0)
@@ -57,7 +58,11 @@ const runRegisterBuilding = async (interaction) => {
 
     const newBuildings = [
         ...factionData.Buildings,
-        {date: newTimestamp, name, cost: calcCosts, income: calcIncomes}
+        {
+            date: newTimestamp, name, 
+            cost: convertToObject(settings, calcCosts), 
+            income: convertToObject(settings, calcIncomes)
+        }
     ]
 
     setFaction(server, faction, {Buildings: newBuildings});

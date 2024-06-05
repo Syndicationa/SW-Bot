@@ -1,13 +1,19 @@
-const splitCurrency = (input = "", def = "ER") => {
-    const trim = input.trim();
-    let result = trim.match(/\d+(k|[mb](il)?|t(ril)?)?[^\d+|;]*/g).map(stri => {
-        const str = stri.trim();
-        const number = str.match(/\d+(k|[mb](il)?|t(ril)?)?/g)[0];
-        const resource = str.split(number).slice(-1)[0].trim();
-        return [handleCurrency(number), resource === "" ? def:resource];
-        });
+const { ApplicationCommandManager } = require("discord.js");
 
-    return result;
+const splitCurrency = (input = "", def = "ER") => {
+    try {
+        const trim = input.trim();
+        let result = trim.match(/\d+[.,]?\d*(k|[mb](il)?|t(ril)?)?[^\d+|;]*/g).map(stri => {
+            const str = stri.trim();
+            const number = str.match(/\d+[.,]?\d*(k|[mb](il)?|t(ril)?)?/g)[0];
+            const resource = str.split(number).slice(-1)[0].trim();
+            return [handleCurrency(number), resource === "" ? def:resource];
+            });
+
+        return result;
+    } catch (e) {
+        return [NaN, def];
+    }
 }
 
 const handleCurrency = (input = "") => {
@@ -51,11 +57,11 @@ const handleReturnMultiple = (obj, order = undefined, join = "\n") => {
 
     console.log(obj);
     
-    let source = order ?? Object.keys(obj);
+    let source = order ?? Object.keys(obj).sort();
     
     return source.map(
-        (str) => `${handleReturn(obj[str]).trim()} ${str}`
-    ).join(join);
+        (str) => obj[str] === 0 ? undefined:`${handleReturn(obj[str]).trim()} ${str}`
+    ).filter((v) => v !== undefined).join(join);
 }
 
 const handleReturn = (number = 0) => {
@@ -69,7 +75,14 @@ const handleReturn = (number = 0) => {
     return `${pretty} ${ending}`
 }
 
+const defaultResources = settings => settings.Resources.reduce((acc, resourceName) => {return {...acc, [resourceName]: 0}}, {})
+
+const convertToObject = (settings, costList) => costList.reduce(
+    (resources, [amount, name]) => {return {...resources, [name]: resources[name] + amount}},
+    defaultResources(settings)
+);
+
 
 //console.log(splitCurrency("20b EM; 320m PM + 20 NM"));
 
-module.exports = {splitCurrency, handleCurrency, handleReturnMultiple, handleReturn};
+module.exports = {splitCurrency, handleCurrency, handleReturnMultiple, handleReturn, defaultResources, convertToObject};
