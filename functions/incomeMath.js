@@ -17,6 +17,11 @@ const scaleResources = (resourcesA, scale) =>
 
 const roundResources = (resources) => objectMap(resources, (a) => Math.round(a));
 
+const maxResources = (resourcesA, resourcesB = {}) => 
+    objectMap(resourcesA, 
+        (resource, name) => Math.max(resource, (resourcesB[name] ?? 0))
+    );
+
 const calculatePopulation = (faction) => {
     const res = faction.Resources
     const consumableInfluence = res.CS * 10000/ res.Population;
@@ -62,4 +67,4 @@ const calculateIncome = (faction, settingMaps, blank) => {
     return calculateERIncome(calculatePopulation({...faction, Income: buildingIncome}))
 }
 
-module.exports = {addResources, mulResources, scaleResources, roundResources, calculateIncome};
+module.exports = {addResources, mulResources, scaleResources, roundResources, maxResources, calculateIncome};
