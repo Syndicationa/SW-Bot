@@ -5,9 +5,19 @@ const addResources = (resourcesA, resourcesB) =>
         (resource, name) => resource + (resourcesB[name] ?? 0)
     );
 
+const subResources = (resourcesA, resourcesB) => 
+    objectMap(resourcesA, 
+        (resource, name) => resource - (resourcesB[name] ?? 0)
+    );
+
 const mulResources = (resourcesA, resourcesB) => 
     objectMap(resourcesA, 
         (resource, name) => resource * (resourcesB[name] ?? 1)
+    );
+
+const divResources = (resourcesA, resourcesB) => 
+    objectMap(resourcesA, 
+        (resource, name) => resource / (resourcesB[name] ?? 1)
     );
 
 const scaleResources = (resourcesA, scale) => 
@@ -67,4 +77,4 @@ const calculateIncome = (faction, settingMaps, blank) => {
     return calculateERIncome(calculatePopulation({...faction, Income: buildingIncome}))
 }
 
-module.exports = {addResources, mulResources, scaleResources, roundResources, maxResources, calculateIncome};
+module.exports = {addResources, subResources, mulResources, divResources, scaleResources, roundResources, maxResources, calculateIncome};
