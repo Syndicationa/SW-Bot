@@ -21,7 +21,7 @@ const planets = {
 
 const test = async () => {
     console.log(date.join("/"));
-    const response = await fetch(address(planets.Saturn, planets.Mercury, date));
+    const response = await fetch(address(planets.Barycenter, planets.Saturn, date));
     const str = (await response.json()).result;
 
     const lt = Number(str.match(/LT= \d\.\d+E\+\d+/g)[0].slice(3));

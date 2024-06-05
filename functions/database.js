@@ -1,5 +1,5 @@
 const { db } = require('../firebase');
-const { updateIncome } = require('./functions');
+const {calculateIncome} = require('./incomeMath');
 
 let database;
 
@@ -35,6 +35,8 @@ const getFaction = async (server, faction) => {
     const document = await db.collection(server).doc(faction.toLowerCase()).get();
     return document.data();
 }
+
+const getServers = () => Object.keys(database);
 
 const getFactionNames = (server, f = () => true) => {
     const serverData = database[server];
@@ -76,7 +78,7 @@ const deletePlace = (server, place) => {
         const factionData = serverData[faction];
 
         const zeroedMap = {...factionData.Maps, [place]: 0};
-        const newIncome = updateIncome(factionData, zeroedMap, serverData.settings.Places);
+        const newIncome = calculateIncome(factionData, zeroedMap, serverData.settings.Places);
 
         delete factionData.Maps[place];
         serverData[faction] = {...factionData, Income: newIncome}
@@ -89,9 +91,10 @@ const deletePlace = (server, place) => {
     serverDB.doc("settings").set(serverData.settings);
 }
 
-module.exports = {getFaction, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace}
+module.exports = {getFaction, getServers, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace};
 
 const fs = require('node:fs');
+const FirebaseFirestore = require("@google-cloud/firestore");
 
 const run = async () => {
     await setDatabase();
@@ -100,4 +103,27 @@ const run = async () => {
     fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
 
     printDatabase();
+}
+
+const saveToDatabase = async () => {
+    await setDatabase();
+
+    const data = fs.readFileSync('./database.txt', "utf8", () => {});
+    const database = JSON.parse(data);
+    for (server in database) {
+        for (faction in database[server]) {
+            const data = database[server][faction]
+            if (faction === "settings") {
+                createFaction(server, faction, data);
+                continue;
+            }
+            const newResources = {Resources: {...data.Resources, Military: 0, Population: 40000000, Influence: 0}}
+            const newStorage = {Storage: {...data.Storage, Population: 40000000}}
+            const {_seconds, _nanoseconds} = data.date;
+            const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
+            createFaction(server, faction, {...data, ...newResources, ...newStorage, date});
+            console.log(`Fixing ${faction}`);
+        }
+    }
+    console.log("Hopefully done!")
 }
