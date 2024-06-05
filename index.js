@@ -3,7 +3,8 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 const { saveLogs } = require('./functions/log');
-const { setDatabase, printDatabase } = require('./functions/database');
+const { setDatabase, printDatabase, getServers } = require('./functions/database');
+const { collectIncome } = require('./functions/income');
 
 const useLogs = false;
 console.clear()
@@ -57,8 +58,14 @@ client.once(Events.ClientReady, c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
-setInterval(setDatabase, 600000);
-setDatabase();
+
+const action = async () => {
+	await setDatabase();
+	collectIncome();
+}
+
+setInterval(action, 600000);
+action();
 
 // Log in to Discord with your client's token
 client.login(token);
