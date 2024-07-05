@@ -3,6 +3,7 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const {getFaction,} = require("../../functions/database");
 const { log } = require('../../functions/log');
 const { handleReturnMultiple } = require('../../functions/currency');
+const { buildingCost } = require('../../functions/incomeMath');
 
 const regBLog = log('registerBuidling');
 
@@ -24,7 +25,7 @@ const runListConstructs = async (interaction) => {
     const buildings = 
         factionData.Buildings.map(
             (build, i) => 
-                `ID: ${i} ${build.name} @ ${handleReturnMultiple(build.cost, undefined, ", ")}`
+                `ID: ${i} ${build.name} @ ${handleReturnMultiple(buildingCost(factionData, i), undefined, ", ")}`
         ).join("\n ");
     const vehicles = 
         factionData.Vehicles.map(

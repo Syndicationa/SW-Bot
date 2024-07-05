@@ -4,7 +4,9 @@ const { splitCurrency, handleReturnMultiple } = require('../../functions/currenc
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
-const { objectMap } = require('../../functions/functions');
+const { objectMap, objectReduce } = require('../../functions/functions');
+const { getFactionStats } = require('../../functions/income');
+const { countBuildings, scaleResources, subResources, minResources, maxResources, equResources, roundResources, buildingCost } = require('../../functions/incomeMath');
 
 const buyLog = log('buy')
 
@@ -12,7 +14,7 @@ const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
     {name: "index", description: "Building to be bought", type: "Integer", required: true},
     {name: "location", description: "Where to build the building", type: "String", required: true},
-    {name: "amount", description: "Number to be built", type: "String", required: true},
+    {name: "amount", description: "Number to be built", type: "Integer", required: true},
 ]
 
 const runBuy = async (interaction) => {
@@ -38,17 +40,20 @@ const runBuy = async (interaction) => {
         error = 'Location not found';
         buyLog({arguments, error});
         await interaction.reply(error);
+        return;
     } else if (place === undefined || place.Hexes === 0) {
         error = "No hexes in place";
         buyLog({arguments, error});
         await interaction.reply(error);
-    } else if (place.Hexes < place.Buildings.reduce((a, b) => a + b, 0)) {
+        return;
+    } else if (place.Hexes < place.Buildings.reduce((a, b) => a + countBuildings(b), 0)) {
         error = "Not enough hexes";
         buyLog({arguments, error});
         await interaction.reply(error);
+        return;
     }
 
-    const costs = objectMap(factionData.Buildings[index].cost, (n) => n*amount);
+    const costs = buildingCost(factionData, index, amount);
 
     const NaNCosts = Object.keys(costs).some((res) => isNaN(costs[res]));
     if (NaNCosts || costs === undefined) {
@@ -59,31 +64,22 @@ const runBuy = async (interaction) => {
     }
 
     const resources = factionData.Resources;
-    
-    const newResources = 
-        objectMap(resources,
-            (count, res) => {
-            const nVal = count - costs[res];
-            
-            if (count >= 0 && nVal < 0 && error === "") {
-                error = 'Not enough funds';
-            }
 
-            return nVal;
-        })
+    const newResources = roundResources(subResources(resources, costs));
+    const newRes0 = maxResources(newResources);
 
-    if (error !== "") {
+    if (!equResources(newResources, newRes0)) {
+        error = 'Not enough funds';
         buyLog({arguments, error});
         await interaction.reply(error);
+        return;
     }
-
-    if (Object.keys(newResources).length !== Object.keys(costs).length) return;
 
     const oldBuilding = place.Buildings[index] ?? {};
 
     const newBuilding = {
         ...oldBuilding,
-        "0": (oldBuilding["0"] ?? 0) + 1
+        "0": (oldBuilding["0"] ?? 0) + amount
     }
 
     const newBuildings = place.Buildings;
@@ -95,16 +91,16 @@ const runBuy = async (interaction) => {
             Fleets: [],
             Hexes: 0,
             ...(place ?? {}),
-            Buildings: newBuildings,
+            Buildings: Array.from(newBuildings, (l) => l ?? null),
         }
     }
 
-    console.log(newResources);
+    const tFaction = {...factionData, Resources: {...resources, ...newResources}, Maps: newMaps};
+    const stats = getFactionStats(settings, tFaction);
 
-    setFaction(server, faction, {Resources: {...resources, ...newResources}});
-    setFaction(server, faction, {Maps: newMaps});
+    setFaction(server, faction, {Resources: {...resources, ...newResources}, Maps: newMaps, ...stats});
     await interaction.reply(
-        `${faction} has bought ${amount} ${factionData.Buildings[index].name} for $${handleReturnMultiple(costs, settings.Resources)}`
+        `${faction} has bought ${amount} ${factionData.Buildings[index].name} for ${handleReturnMultiple(costs, settings.Resources)}`
     );
 }
 

@@ -17,6 +17,7 @@ for (const folder of commandFolders) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
 		if ('data' in command && 'execute' in command) {
+			console.log(`${commands.length} ${filePath}`)
 			commands.push(command.data.toJSON());
 		} else {
 			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
@@ -26,29 +27,29 @@ for (const folder of commandFolders) {
 
 // Construct and prepare an instance of the REST module
 const rest = new REST().setToken(token);
-
-// for guild-based commands
-rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
-	.then(() => console.log('Successfully deleted all guild commands.'))
-	.catch(console.error);
-
-// for global commands
-rest.put(Routes.applicationCommands(clientId), { body: [] })
-	.then(() => console.log('Successfully deleted all application commands.'))
-	.catch(console.error);
-
 // and deploy your commands!
 (async () => {
 	try {
+		await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
+		await rest.put(Routes.applicationCommands(clientId), { body: [] })
+
 		console.log(`Started refreshing ${commands.length} application (/) commands.`);
-
 		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await await rest.put(
-			Routes.applicationCommands(clientId),
-			{ body: commands },
-		);		
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		await commands.forEach(async (command, i) => {
+			const d0 = rest.put(
+				Routes.applicationCommands(clientId),
+				{ body: [command]},
+			);
+	
+			console.log(d0);
+			const d1 = await d0
+			console.log(d1)
+			const data = await d1
+			console.log(data)
+	
+			console.log(`Successfully reloaded ${i} application (/) commands.`);
+		})
 	} catch (error) {
 		// And of course, make sure you catch and log any errors!
 		console.error(error);

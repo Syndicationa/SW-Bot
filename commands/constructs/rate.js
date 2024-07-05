@@ -15,7 +15,7 @@ const inputs = [
     {name: "stealth", description: "Has Stealth", type: "Boolean", required: false},
 	{name: "systems", description: "Additional systems", type: "Integer", required: false},
 
-	{name: "engines", description: "(count) (S/M/L) + (count) (S/M/L)", type: "String", required: false},
+	{name: "engines", description: "4S 2M 1L", type: "String", required: false},
     {name: "ftl", description: "Specify type of FTL", type: "String", required: false, 
         choices: [{name: "External", value: "EXT"}, {name: "Internal", value: "INT"}, {name: "None", value: "NONE"}]},
 

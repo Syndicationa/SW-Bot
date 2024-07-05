@@ -5,6 +5,7 @@ const { collectIncome } = require('../../functions/income');
 const sync = {
     data: new SlashCommandBuilder().setName('sync').setDescription('Test Command'),
     execute: async (interaction) => {
+        console.log(interaction.user);
         const name = interaction.user.username;
         if (name !== "fer.0" && name !== "syndicationus") {
             await interaction.reply('Pong!')

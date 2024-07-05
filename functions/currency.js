@@ -1,5 +1,3 @@
-const { ApplicationCommandManager } = require("discord.js");
-
 const splitCurrency = (input = "", def = "ER") => {
     try {
         const trim = input.trim();
@@ -44,8 +42,6 @@ const handleCurrency = (input = "") => {
     return number*multiplier
 }
 
-const reverseString = str => str.split("").reverse().join("");
-
 const resourceArrayToObject = (arr) => 
     arr.reduce((acc, v) => {
         return {...acc, [v[1]]: v[0]}
@@ -65,9 +61,7 @@ const handleReturnMultiple = (obj, order = undefined, join = "\n") => {
 }
 
 const handleReturn = (number = 0) => {
-    const reverseSpaced = 
-        reverseString(`${number}`).replace(/([0-9]{3})/g,"$1 ");
-    const pretty = reverseString(reverseSpaced);
+    const pretty = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     
     const suffixes = ['(mil)', '(bil)', '(tril)'];
     const end = Math.floor(Math.log10(number) / 3) - 2
@@ -75,11 +69,11 @@ const handleReturn = (number = 0) => {
     return `${pretty} ${ending}`
 }
 
-const defaultResources = settings => settings.Resources.reduce((acc, resourceName) => {return {...acc, [resourceName]: 0}}, {})
+const defaultResources = resources => resources.reduce((acc, resourceName) => {return {...acc, [resourceName]: 0}}, {})
 
-const convertToObject = (settings, costList) => costList.reduce(
+const convertToObject = (resources, costList) => costList.reduce(
     (resources, [amount, name]) => {return {...resources, [name]: resources[name] + amount}},
-    defaultResources(settings)
+    defaultResources(resources)
 );
 
 
