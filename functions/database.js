@@ -1,5 +1,5 @@
 const { db } = require('../firebase');
-const { updateIncome } = require('./functions');
+const {calculateIncome, minResources, maxResources, addResources} = require('./incomeMath');
 
 let database;
 
@@ -36,9 +36,13 @@ const getFaction = async (server, faction) => {
     return document.data();
 }
 
-const getFactionNames = (server, f = () => true) => {
+const getServers = () => Object.keys(database);
+
+const getFactionNames = (server, f = () => true, addData = a => a) => {
     const serverData = database[server];
-    return Object.keys(serverData).filter((faction) => f(faction, serverData[faction]));
+    return Object.keys(serverData)
+                .filter((faction) => f(faction, serverData[faction]))
+                .map((name) => addData(name, serverData[name]));
 }
 
 const setFaction = (server, faction, newData) => {
@@ -76,7 +80,7 @@ const deletePlace = (server, place) => {
         const factionData = serverData[faction];
 
         const zeroedMap = {...factionData.Maps, [place]: 0};
-        const newIncome = updateIncome(factionData, zeroedMap, serverData.settings.Places);
+        const newIncome = calculateIncome(factionData, zeroedMap, serverData.settings.Places);
 
         delete factionData.Maps[place];
         serverData[faction] = {...factionData, Income: newIncome}
@@ -88,16 +92,63 @@ const deletePlace = (server, place) => {
 
     serverDB.doc("settings").set(serverData.settings);
 }
+module.exports = {getFaction, getServers, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace};
+
+const fs = require('node:fs');
+const FirebaseFirestore = require("@google-cloud/firestore");
+const { defaultResources, splitCurrency, convertToObject } = require('./currency');
+const buildings = require("../buildings");
+const { Timestamp } = require('firebase-admin/firestore');
+const { getFactionStats } = require('./income');
 
 const run = async () => {
     await setDatabase();
-    printDatabase();
+    
+    const fileName = `./database6.txt`
+    fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
 
-   
+    printDatabase();
 }
 
-run();
+const saveToDatabase = async () => {
+    await setDatabase();
 
-module.exports = {getFaction, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace, run}
+    const data = fs.readFileSync('./database6.txt', "utf8", () => {});
+    const database = JSON.parse(data);
 
+    // const str = "206b 413k CM 207k EL 369k CS 40m Population";
+    // const res = splitCurrency(str);
+    // const resourceObject = convertToObject(database["The Solar Wars"].settings.Resources, res);
 
+    // console.log(resourceObject);
+
+    for (server in database) {
+        for (faction in database[server]) {
+            const data = database[server][faction]
+            if (faction === "settings") {
+                // createFaction(server, faction, data);
+                continue;
+            }
+            // const Resources = addResources(resourceObject, {ER: data.Resources.ER});
+            const Storage = defaultResources(database[server].settings.Storage);
+            // const Capacities = defaultResources(database[server].settings.Capacities);
+            // const Buildings = buildings;
+            // const {_seconds, _nanoseconds} = data.date;
+            // const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
+
+            const factionInfo = {...data, Storage};
+            
+            const {Capacities: CapacitiesP, Storage: StorageP} = getFactionStats(database[server].settings, factionInfo);
+
+            console.log(CapacitiesP, StorageP);
+
+            const date = Timestamp.fromDate(new Date(Date.UTC(2024, 6, 3)));
+            createFaction(server, faction, {...data, date, Storage: StorageP, Capacities: CapacitiesP});
+            console.log(`Fixing ${faction}`);
+        }
+    }
+    console.log("Hopefully done!")
+}
+
+// run();
+// saveToDatabase();

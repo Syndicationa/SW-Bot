@@ -32,10 +32,3 @@ const runDelete = async (interaction) => {
 
 const command = new SlashCommandBuilder().setName('deleteplace').setDescription('Delete Place');
 generateInputs(command, inputs);
-
-const del = {
-    data: command,
-    execute: runDelete
-}
-
-module.exports = del;

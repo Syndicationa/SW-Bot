@@ -46,8 +46,7 @@ const runBuy = async (interaction) => {
     const newResources = {};
 
     costs.forEach(async (cost) => {
-        const resourceName = cost[1]
-        const amount = cost[0]
+        const [amount, resourceName] = cost;
         const nVal = resources[resourceName] - amount;
         
         if (nVal < 0) {

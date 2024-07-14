@@ -4,24 +4,18 @@ const objectMap = (obj, func) =>
             return {...acc, [key]: func(obj[key], key, obj)}
         }, {})
 
-const updateIncome = (faction, newMaps, mapData) => {
-    const income = faction.Income;
-    const maps = faction.Maps;
+const objectReduce = (obj, func, start) => typeof obj !== "object" ? start:
+    Object.keys(obj).reduce(
+        (acc, key) => func(acc, obj[key], key, obj), start)
 
-    const newIncome = Object.keys(newMaps).reduce((accIncome, mapName) => {
-        const count = maps[mapName] ?? 0;
-        const nCount = newMaps[mapName];
-        const data = mapData[mapName].ResourceIncome;
+const split = (resources = ["U-EL", "EL", "ER"]) => {
+    const unrefined = resources.filter((v) => v.startsWith("U-"));
+    const refined = unrefined.map(str => str.slice(2));
+    
+    const refinedMap = new Set(refined);
+    const unique = resources.filter(str => !refinedMap.has(str) && !refinedMap.has(str.slice(2)));
 
-        const mapIncome = objectMap(accIncome, (amount, resource) => {
-            const shift = data[resource]*(nCount - count);
-            return amount + shift;
-        });
-
-        return mapIncome
-    }, income);
-
-    return newIncome;
+    return [unrefined, refined, unique];
 }
 
-module.exports = {objectMap, updateIncome};
+module.exports = {objectMap, objectReduce, split};
