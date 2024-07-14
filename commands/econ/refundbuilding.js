@@ -6,7 +6,7 @@ const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { objectMap, objectReduce } = require('../../functions/functions');
 const { getFactionStats } = require('../../functions/income');
-const { countBuildings, scaleResources, maxResources, equResources, roundResources, addResources } = require('../../functions/incomeMath');
+const { countBuildings, scaleResources, maxResources, equResources, roundResources, addResources, buildingScale } = require('../../functions/incomeMath');
 
 const buyLog = log('refund')
 
@@ -22,11 +22,12 @@ const inputs = [
     {name: "level", description: "Level to be sold from", type: "Integer", required: true},
     {name: "location", description: "Where to sell the building", type: "String", required: true},
     {name: "amount", description: "Number to be sold", type: "Integer", required: true},
+    {name: "week", description: "Has it been less than a week", type: "Boolean", required: false}
 ]
 
 const runRefund = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
-    const {faction, index, level: lvl, location, amount} = arguments;
+    const {faction, index, level: lvl, location, amount, week} = arguments;
     const level = lvl - 1;
     const server = interaction.guild.name;
     let error = "";
@@ -60,9 +61,9 @@ const runRefund = async (interaction) => {
 
     const buildingCount = objectReduce(factionData.Maps, (a, p) => a + p.Buildings.reduce((a, b) => a + countBuildings(b), 0),0);
 
-    const scale = amount+increaseRate*sumCN(buildingCount - amount, amount)
+    const scale = buildingScale(buildingCount - amount, amount);
 
-    const costs = roundResources(scaleResources(factionData.Buildings[index].cost, (scale + sumN(level))*refundRate));
+    const costs = roundResources(scaleResources(factionData.Buildings[index].cost, (scale + sumN(level)*amount)*(week ? 1:refundRate)));
 
     const NaNCosts = Object.keys(costs).some((res) => isNaN(costs[res]));
     if (NaNCosts || costs === undefined) {

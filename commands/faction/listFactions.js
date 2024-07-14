@@ -32,6 +32,8 @@ const factionQualities = quality => {
             return (_, d) => d.inc === undefined;
         case "hasLand":
             return (n, d) => n !== "settings" && count(d) > 0;
+        case "noER":
+            return (_, d) => d.Resources.ER === 0
         case undefined:
             return () => true;
         default:
@@ -45,9 +47,10 @@ const runNations = async (interaction) => {
         const server = interaction.guild.name;
         const f = factionQualities(type);
         const outputValue = getFactionNames(server, f, getHexCounts);
-        await interaction.reply(`${outputValue.join("\n")}`);
+        await interaction.reply(`${outputValue.join("\n") || "No nation meet criteria"}`);
     } catch (e) {
         let err = "Invalid Quality"
+        console.log(e);
         nationLog({arguments: {type}, error: err});
         await interaction.reply(`${err}`)
     }

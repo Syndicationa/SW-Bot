@@ -37,7 +37,7 @@ const handleCurrency = (input = "") => {
             multiplier *= 1000;
             break;
         default:
-            number = number*10 + Number(letter);
+            number = Number(number.toString() + letter);
     }
     return number*multiplier
 }

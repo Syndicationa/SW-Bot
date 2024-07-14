@@ -99,11 +99,13 @@ const fs = require('node:fs');
 const FirebaseFirestore = require("@google-cloud/firestore");
 const { defaultResources, splitCurrency, convertToObject } = require('./currency');
 const buildings = require("../buildings");
+const { Timestamp } = require('firebase-admin/firestore');
+const { getFactionStats } = require('./income');
 
 const run = async () => {
     await setDatabase();
     
-    const fileName = `./database5.txt`
+    const fileName = `./database6.txt`
     fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
 
     printDatabase();
@@ -112,29 +114,37 @@ const run = async () => {
 const saveToDatabase = async () => {
     await setDatabase();
 
-    const data = fs.readFileSync('./database5.txt', "utf8", () => {});
+    const data = fs.readFileSync('./database6.txt', "utf8", () => {});
     const database = JSON.parse(data);
 
-    const str = "206b 413k CM 207k EL 369k CS 40m Population";
-    const res = splitCurrency(str);
-    const resourceObject = convertToObject(database["The Solar Wars"].settings.Resources, res);
+    // const str = "206b 413k CM 207k EL 369k CS 40m Population";
+    // const res = splitCurrency(str);
+    // const resourceObject = convertToObject(database["The Solar Wars"].settings.Resources, res);
 
-    console.log(resourceObject);
+    // console.log(resourceObject);
 
     for (server in database) {
         for (faction in database[server]) {
             const data = database[server][faction]
             if (faction === "settings") {
-                createFaction(server, faction, data);
+                // createFaction(server, faction, data);
                 continue;
             }
-            const Resources = addResources(resourceObject, {ER: data.Resources.ER});
+            // const Resources = addResources(resourceObject, {ER: data.Resources.ER});
             const Storage = defaultResources(database[server].settings.Storage);
-            const Capacities = defaultResources(database[server].settings.Capacities);
-            const Buildings = buildings;
-            const {_seconds, _nanoseconds} = data.date;
-            const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
-            createFaction(server, faction, {...data, Resources, Storage, Capacities, Usages: Capacities, Buildings, date});
+            // const Capacities = defaultResources(database[server].settings.Capacities);
+            // const Buildings = buildings;
+            // const {_seconds, _nanoseconds} = data.date;
+            // const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
+
+            const factionInfo = {...data, Storage};
+            
+            const {Capacities: CapacitiesP, Storage: StorageP} = getFactionStats(database[server].settings, factionInfo);
+
+            console.log(CapacitiesP, StorageP);
+
+            const date = Timestamp.fromDate(new Date(Date.UTC(2024, 6, 3)));
+            createFaction(server, faction, {...data, date, Storage: StorageP, Capacities: CapacitiesP});
             console.log(`Fixing ${faction}`);
         }
     }

@@ -14,11 +14,10 @@ const updateDate = (LastUpdated = new Date()) => {
 };
 
 const getFactionStats = (settings, faction) => {
-    const blankRes = defaultResources(settings.Resources);
+    const blankSto = defaultResources(settings.Storage);
     const blankCap = defaultResources(settings.Capacities);
 
-    const {Storage, Capacities} = calculateCapacities(faction, settings.Places, blankRes, blankCap);
-    return {Storage, Capacities};
+    return calculateCapacities(faction, settings.Places, blankSto, blankCap);
 };
 
 const income = async (server, faction) => {
@@ -40,13 +39,14 @@ const income = async (server, faction) => {
     const {weeks, date: newDate} = updateDate(lastDate);
     
     // console.log(faction, weeks);
-    if (weeks <= 0 || faction !== "dummy") return;
+    if (weeks <= 0) return;
     if (weeks > 1) throw Error(`Please check ${faction} in the database`);
 
     console.log(`Collecting income for ${faction}`);
 
     const income = calculateIncome(factionData);
     const newResources = addResources(resources, income);
+    console.log(factionData.Storage);
     const cappedResources = maxResources(minResources(newResources, factionData.Storage));
 
     const newTimestamp = Timestamp.fromDate(newDate);

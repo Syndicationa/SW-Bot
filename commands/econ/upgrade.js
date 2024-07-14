@@ -69,7 +69,7 @@ const runBuy = async (interaction) => {
         return;
     }
 
-    const originalLevel = Object.keys(buildings).filter(str => Number(str) !== level && buildings[str] > 0).reverse()[0];
+    const originalLevel = Number(Object.keys(buildings).filter(str => Number(str) < level && buildings[str] > 0).reverse()[0]);
 
     const costs = roundResources(scaleResources(factionData.Buildings[index].cost, sumCT(originalLevel, level)));
 
@@ -120,7 +120,7 @@ const runBuy = async (interaction) => {
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}, Maps: newMaps, ...stats});
     await interaction.reply(
-        `${faction} has upgraded a lvl ${Number(originalLevel) + 1} ${factionData.Buildings[index].name} to lvl ${level + 1} for ${handleReturnMultiple(costs, settings.Resources)}`
+        `${faction} has upgraded a lvl ${originalLevel + 1} ${factionData.Buildings[index].name} to lvl ${level + 1} for ${handleReturnMultiple(costs, settings.Resources)}`
     );
 }
 

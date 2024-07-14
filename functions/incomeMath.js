@@ -72,18 +72,18 @@ const calculateERIncome = (Resources) => {
 const economicCountBuildings = (buildingObject) => objectReduce(buildingObject ?? {}, (acc, count, level) => (Number(level) + 1)*count + acc, 0);
 const countBuildings = (buildingObject) => objectReduce(buildingObject ?? {}, (acc, count) => count + acc, 0);
 
-const calculateIncomeOnWorld = (settingsPlanet, planet, buildings, blank) =>
+const calculateIncomeOnWorld = (settingsPlanet, planet, buildings, blankStorage, blankCapacities) =>
     planet.Buildings.reduce(
         (acc, building, index) => {
             if (building === null) return acc;
             const count = economicCountBuildings(building);
 
-            const capacities = addResources(mulResources(scaleResources(buildings[index].capacity, count), scaleResources(settingsPlanet.Resources, 1/100)), acc.capacities);
-            const storage = addResources(scaleResources(buildings[index].storage, count),acc.storage);
+            const capacities = roundResources(addResources(mulResources(scaleResources(buildings[index].capacity, count), scaleResources(settingsPlanet.Resources, 1/100)), acc.capacities));
+            const storage = roundResources(addResources(scaleResources(buildings[index].storage, count),acc.storage));
 
             return {storage, capacities};
         }
-        , {storage: blank, capacities: blank}
+        , {storage: blankStorage, capacities: blankCapacities}
     )
 
 const calculateIncome = (faction) => {
@@ -114,22 +114,19 @@ const calculateIncome = (faction) => {
             return income
         });
 
-    console.log(`Resources: ${JSON.stringify(Resources)}`);
-    console.log(`Unrefined: ${JSON.stringify(unrefinedIncome)}`);
-
     return {...unrefinedIncome, ...refinedIncome, ...uniqueIncome};
 }
 
-const calculateCapacities = (faction, settingMaps, blank) => {
+const calculateCapacities = (faction, settingMaps, blankStorage, blankCapacities) => {
     const {storage, capacities} = objectReduce(faction.Maps,
         (acc, map, name) => {
-            const {storage, capacities} = calculateIncomeOnWorld(settingMaps[name], map, faction.Buildings, blank);
+            const {storage, capacities} = calculateIncomeOnWorld(settingMaps[name], map, faction.Buildings, blankStorage, blankCapacities);
             return {
                 storage: addResources(storage, acc.storage),
                 capacities: addResources(capacities, acc.capacities)
             }
         },
-        {storage: blank, capacities: blank}
+        {storage: blankStorage, capacities: blankCapacities}
     )
     return {...faction, Storage: storage, Capacities: capacities};
 }
@@ -138,13 +135,18 @@ const increaseRate = 0.02;
 
 const sumCN = (c, n) => n*(n+2*c-1)/2;
 
-const buildingCost = (factionData, index, amount = 1) => {
-    const buildingCount = objectReduce(factionData.Maps, (a, p) => a + p.Buildings.reduce((a, b) => a + countBuildings(b), 0),0);
-    const countPrime = Math.max(buildingCount - 26, 0);
-    const amountPrime = Math.max(amount - 26 - (buildingCount - countPrime),0);
+const buildingScale = (count, amount) => {
+    const countPrime = Math.max(count - 26, 0);
+    const amountPrime = Math.max(amount - 26 + (count - countPrime),0);
     const newBuildingCount = sumCN(countPrime, amountPrime)
 
-    const scale = amount+increaseRate*newBuildingCount;
+    return amount+increaseRate*newBuildingCount;
+}
+
+const buildingCost = (factionData, index, amount = 1) => {
+    const buildingCount = objectReduce(factionData.Maps, (a, p) => a + p.Buildings.reduce((a, b) => a + countBuildings(b), 0),0);
+    
+    const scale = buildingScale(buildingCount, amount);
 
     return roundResources(scaleResources(factionData.Buildings[index].cost, scale));
 }
@@ -152,4 +154,4 @@ const buildingCost = (factionData, index, amount = 1) => {
 module.exports = {
     addResources, subResources, mulResources, divResources, scaleResources, 
     countBuildings, roundResources, maxResources, minResources, equResources, 
-    calculateCapacities, calculateIncome, buildingCost};
+    calculateCapacities, calculateIncome, buildingScale, buildingCost};
