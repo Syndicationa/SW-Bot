@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
-const { splitCurrency, handleReturnMultiple } = require('../../functions/currency');
+const { splitCurrency, handleReturnMultiple, handleReturn } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
@@ -47,8 +47,6 @@ const runCeres = async (interaction) => {
     const resources = factionData.Resources;
     const newResources = {};
 
-	let GainCount = 0;
-
 	costs.forEach(async (cost) => {
         const resourceName = cost[1]
         const amount = cost[0]
@@ -68,16 +66,12 @@ const runCeres = async (interaction) => {
 	
 	const nVal = resources[gain] + gainAmount;
     newResources[gain] = nVal;
-	
-
-	
-	
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
 	const embed = new EmbedBuilder().setTitle(`Ceres Station`).setColor(0x0099FF).setDescription(
-		`Welcome to Ceres, ${faction}!\nWe have the best prices of the system...\nBuy any resource for 4 other resources!\n\nYou've bought ${gainAmount} ${gain}\nfor ${handleReturnMultiple(costs, settings.Resources)}.`).setImage('attachment://Ceres.png').setThumbnail('attachment://cereslogo.png').setTimestamp();
+		`Welcome to Ceres, ${faction}!\nWe have the best prices of the system...\nBuy any resource for 4 other resources!\n\nYou've bought ${handleReturn(gainAmount)} ${gain}\nfor ${handleReturnMultiple(costs, settings.Resources)}.`).setImage('attachment://Ceres.png').setThumbnail('attachment://cereslogo.png').setTimestamp();
 		
-	await interaction.reply({ embeds: [ embed ],files: ['./files/Ceres.png', './files/cereslogo.png'] });
+	await interaction.reply({ embeds: [ embed ],});
 }
 
 const command = new SlashCommandBuilder().setName('ceres').setDescription('Access the Ceres trading market');

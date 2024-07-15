@@ -68,6 +68,7 @@ const runBuy = async (interaction) => {
 
     if (Object.keys(newResources).length !== Object.keys(costs).length) return;
 
+    
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
     await interaction.reply(
         `${faction} has bought ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
