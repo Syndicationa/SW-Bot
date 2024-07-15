@@ -13,7 +13,7 @@ const inputs = [
     {name: "escorts", description: "Does the fleet include any armed ships?", type: "Boolean", required: true},	
     {name: "fleetcost", description: "Cost of the escorting fleet", type: "Integer", required: false},
     {name: "fleetsize", description: "Size of the escorting fleet", type: "Integer", required: false},
-]
+];
 
 
 const runBelt = async (interaction) => {
@@ -89,59 +89,6 @@ const runBelt = async (interaction) => {
 	}, 60000)
 }
 
-
-
-/*const runbelt = async (interaction) => {
-    const arguments = retrieveInputs(interaction.options, inputs);
-    const {faction, items, amount} = arguments;
-    const server = interaction.guild.name;
-    let error = "";
-
-    const settings = await getFaction(server, "Settings");
-    
-    const costs = splitCurrency(amount);
-
-    const NaNCosts = costs.some((cost) => isNaN(cost[0]));
-    const isValidType = costs.every((cost) => settings.Resources.indexOf(cost[1]) >= 0)
-    if (NaNCosts || !isValidType || costs === undefined) {
-        error = 'Error in amount';
-        beltLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
-
-    const factionData = await getFaction(server, faction);
-    if (factionData === undefined) {
-        error = 'Faction not found';
-        beltLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
-
-    const resources = factionData.Resources;
-    const newResources = {};
-
-    costs.forEach(async (cost) => {
-        const resourceName = cost[1]
-        const amount = cost[0]
-        const nVal = resources[resourceName] + amount;
-        
-        if (nVal < 0) {
-            error = 'Not enough funds';
-            beltLog({arguments, error});
-            await interaction.reply(error);
-            return;
-        }
-
-        newResources[resourceName] = nVal;
-    })
-
-    setFaction(server, faction, {Resources: {...resources, ...newResources}});
-    await interaction.reply(
-        `${faction} has belted ${items} for $${handleReturnMultiple(costs, settings.Resources)}`
-    );
-}
-*/
 const command = new SlashCommandBuilder().setName('belt-mining').setDescription('TEST BROKEN');
 generateInputs(command, inputs);
 
