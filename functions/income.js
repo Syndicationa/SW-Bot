@@ -21,12 +21,7 @@ const getFactionStats = (settings, faction) => {
 };
 
 const income = async (server, faction) => {
-    if (faction.toLowerCase() === "settings") {
-        const factionData = await getFaction(server, faction.toLowerCase());
-        const places = Object.keys(factionData.Places).sort();
-        places.forEach((place) => console.log(`${place}: ${factionData.Places[place].Size}`))
-        return;
-    }
+    if (faction.toLowerCase() === "settings") return;
 
     const factionData = await getFaction(server, faction.toLowerCase());
     if (factionData === undefined) {

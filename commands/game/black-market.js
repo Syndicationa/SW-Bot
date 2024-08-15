@@ -37,10 +37,10 @@ const runbMarket = async (interaction) => {
 	
 	let output = "";
 	let nVal = "";
-	const entry = randInt(0,3);
-	if(entry == 0) {
+	const entry = randInt(0,10);
+	if(entry <= 3) {
 		output = "Entry to the black market denied";
-	}else if (entry == 1) {
+	}else if (entry == 9) {
 		output = `Entry to the black market denied, ${faction}. You'll pay for trying to infiltrate us!`;
 		nVal = resources[`ER`] - 50000000000;
 		newResources[`ER`] = nVal;

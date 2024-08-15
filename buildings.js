@@ -12,7 +12,7 @@ const city = {
         CM: 0, "U-CM": 0,
         CS: 0, "U-CS": 0,
         EL: 0, "U-EL": 0,
-        Population: 1000000,
+        Population: 2000000,
         },
     capacity:{
         CM: 0, "U-CM": 0,

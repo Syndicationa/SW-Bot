@@ -105,7 +105,7 @@ const { getFactionStats } = require('./income');
 const run = async () => {
     await setDatabase();
     
-    const fileName = `./database6.txt`
+    const fileName = `./database9.txt`
     fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
 
     printDatabase();
@@ -114,7 +114,7 @@ const run = async () => {
 const saveToDatabase = async () => {
     await setDatabase();
 
-    const data = fs.readFileSync('./database6.txt', "utf8", () => {});
+    const data = fs.readFileSync('./database8.txt', "utf8", () => {});
     const database = JSON.parse(data);
 
     // const str = "206b 413k CM 207k EL 369k CS 40m Population";
@@ -131,20 +131,20 @@ const saveToDatabase = async () => {
                 continue;
             }
             // const Resources = addResources(resourceObject, {ER: data.Resources.ER});
-            const Storage = defaultResources(database[server].settings.Storage);
+            // const Storage = defaultResources(database[server].settings.Storage);
             // const Capacities = defaultResources(database[server].settings.Capacities);
-            // const Buildings = buildings;
-            // const {_seconds, _nanoseconds} = data.date;
-            // const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
+            const Buildings = buildings;
+            const {_seconds, _nanoseconds} = data.date;
+            const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
 
-            const factionInfo = {...data, Storage};
+            const factionInfo = {...data, Buildings};
             
             const {Capacities: CapacitiesP, Storage: StorageP} = getFactionStats(database[server].settings, factionInfo);
 
             console.log(CapacitiesP, StorageP);
 
-            const date = Timestamp.fromDate(new Date(Date.UTC(2024, 6, 3)));
-            createFaction(server, faction, {...data, date, Storage: StorageP, Capacities: CapacitiesP});
+            // const date = Timestamp.fromDate(new Date(Date.UTC(2024, 6, 3)));
+            createFaction(server, faction, {...data, Buildings, date, Storage: StorageP, Capacities: CapacitiesP});
             console.log(`Fixing ${faction}`);
         }
     }

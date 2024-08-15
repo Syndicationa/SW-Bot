@@ -1,24 +1,24 @@
 const { defaultResources } = require('./currency');
 const { objectReduce, objectMap, split } = require('./functions');
 
-const addResources = (resourcesA, resourcesB) => 
-    objectMap(resourcesA, 
-        (resource, name) => resource + (resourcesB[name] ?? 0)
+const addResources = (resourcesA = {}, resourcesB = {}) => 
+    objectMap({...resourcesA, ...resourcesB}, 
+        (_, name) => (resourcesA[name] ?? 0) + (resourcesB[name] ?? 0)
     );
 
-const subResources = (resourcesA, resourcesB) => 
-    objectMap(resourcesA, 
-        (resource, name) => resource - (resourcesB[name] ?? 0)
+const subResources = (resourcesA = {}, resourcesB = {}) => 
+    objectMap({...resourcesA, ...resourcesB}, 
+        (_, name) => (resourcesA[name] ?? 0) - (resourcesB[name] ?? 0)
     );
 
-const mulResources = (resourcesA, resourcesB) => 
-    objectMap(resourcesA, 
-        (resource, name) => resource * (resourcesB[name] ?? 1)
+const mulResources = (resourcesA = {}, resourcesB = {}) => 
+    objectMap({...resourcesA, ...resourcesB}, 
+        (_, name) => (resourcesA[name] ?? 0) * (resourcesB[name] ?? 1)
     );
 
-const divResources = (resourcesA, resourcesB) => 
-    objectMap(resourcesA, 
-        (resource, name) => resource / (resourcesB[name] ?? 1)
+const divResources = (resourcesA = {}, resourcesB = {}) => 
+    objectMap({...resourcesA, ...resourcesB}, 
+        (_, name) => (resourcesA[name] ?? 0) / (resourcesB[name] ?? 1)
     );
 
 const scaleResources = (resourcesA = {}, scale) => 
@@ -80,7 +80,8 @@ const calculateIncomeOnWorld = (settingsPlanet, planet, buildings, blankStorage,
 
             const capacities = roundResources(addResources(mulResources(scaleResources(buildings[index].capacity, count), scaleResources(settingsPlanet.Resources, 1/100)), acc.capacities));
             const storage = roundResources(addResources(scaleResources(buildings[index].storage, count),acc.storage));
-
+        
+            // console.log(building, buildings[index].capacity, capacities);
             return {storage, capacities};
         }
         , {storage: blankStorage, capacities: blankCapacities}
@@ -114,7 +115,7 @@ const calculateIncome = (faction) => {
             return income
         });
 
-    return {...unrefinedIncome, ...refinedIncome, ...uniqueIncome};
+    return roundResources({...unrefinedIncome, ...refinedIncome, ...uniqueIncome});
 }
 
 const calculateCapacities = (faction, settingMaps, blankStorage, blankCapacities) => {
