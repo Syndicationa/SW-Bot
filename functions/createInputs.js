@@ -6,7 +6,8 @@ const exampleInputs = [
         required: false,
         choices: [
             {name: "A", value: "A"}
-        ]
+        ],
+        default: ""
     }
 ];
 
@@ -45,33 +46,33 @@ const generateInputs = (command, inputArray = exampleInputs) => {
     })
 }
 
-const retrieveFunction = type => {
+const retrieveFunction = (input = exampleInputs) => {
     switch (type) {
         case "String":
-            return (option, name) => option.getString(name)
+            return (option, name) => option.getString(name) ?? input.default
         case "Integer":
-            return (option, name) => option.getInteger(name) 
+            return (option, name) => option.getInteger(name) ?? input.default
         case "Number":
-            return (option, name) => option.getNumber(name) 
+            return (option, name) => option.getNumber(name) ?? input.default
         case "Boolean":
-            return (option, name) => option.getBoolean(name) 
+            return (option, name) => option.getBoolean(name) ?? input.default
         case "User":
-            return (option, name) => option.getUser(name) 
+            return (option, name) => option.getUser(name) ?? input.default
         case "Channel":
-            return (option, name) => option.getChannel(name) 
+            return (option, name) => option.getChannel(name) ?? input.default
         case "Role":
-            return (option, name) => option.getRole(name) 
+            return (option, name) => option.getRole(name) ?? input.default
         case "Mentionable":
-            return (option, name) => option.getMentionable(name) 
+            return (option, name) => option.getMentionable(name) ?? input.default
         case "Attachment":
-            return (option, name) => option.getAttachment(name) 
+            return (option, name) => option.getAttachment(name) ?? input.default
     }
 }
 
 const retrieveInputs = (option, inputArray = exampleInputs) => {
     let output = {};
     inputArray.forEach((input) => {
-        const data = retrieveFunction(input.type)(option, input.name);
+        const data = retrieveFunction(input)(option, input.name);
         if (data !== null) output = {...output, [input.name]: data};
     })
     return output;
