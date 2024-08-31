@@ -43,11 +43,12 @@ const equResources = (resourcesA, resourcesB = {}) =>
     Object.keys(resourcesB).every((key) => resourcesB[key] === (resourcesA[key] ?? NaN));
 
 const calculatePopulation = (res, capacities) => {
+    //
     const consumableInfluence = (res.CS + capacities.CS) * 10000/ res.Population;
     const populationGrowth = 
-       consumableInfluence <= 0.45 ? -5
-       : consumableInfluence < 1 ? ((consumableInfluence - 1)*0.1)
-       : consumableInfluence <= 2 ? consumableInfluence*0.025
+       consumableInfluence <= 0.5 ? -5
+       : consumableInfluence <= 1 ? (consumableInfluence - 1)*0.1
+       : consumableInfluence <= 2 ? (consumableInfluence - 1)*0.05
        : 5;
     const population = res.Population*populationGrowth/100;
     return population;
