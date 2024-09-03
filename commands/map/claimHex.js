@@ -55,7 +55,22 @@ const runClaim = async (interaction) => {
             Hexes: (factionData.Maps[place]?.Hexes ?? 0) + count,
         }
     };
-
+	const resources = factionData.Resources;
+	const newResources = {};
+	const capacities = factionData.Capacities;
+	const newCapacities = {};
+	
+	newResources[`Influence`] = resources[`Influence`] - count * 20;
+	newCapacities[`PB`] = capacities[`PB`] + count;
+	
+	if (newResources[`Influence`] < 0) {
+        error = 'Not enough Influence';
+        claimLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
+	setFaction(server, faction, {Capacities: {...capacities, ...newCapacities}});
+	setFaction(server, faction, {Resources: {...resources, ...newResources}});
     setFaction(server, faction, {Maps: newMaps});
     claimPlace(server, place, count);
     await interaction.reply(`${faction} has claimed ${count} on ${place}`);

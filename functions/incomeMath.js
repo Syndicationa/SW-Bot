@@ -42,6 +42,17 @@ const equResources = (resourcesA, resourcesB = {}) =>
     Object.keys(resourcesA).every((key) => resourcesA[key] === (resourcesB[key] ?? NaN)) && 
     Object.keys(resourcesB).every((key) => resourcesB[key] === (resourcesA[key] ?? NaN));
 
+const calculateInfluence = (res, capacities, TMaps, Income) => {
+    const hexCount = objectReduce(TMaps, (count, map) => count + map.Hexes, 0)
+    const InfluenceIncome = Income[`Influence`]; // Influence Income changes from pacts and human events.
+    let influence = Math.round(249000/(hexCount+50) + 10) - InfluenceIncome;
+	if((res.Influence + influence) >= 10000)
+	{
+		influence = 10000 - (res.Influence + influence);
+	}
+    return influence;
+} 
+
 const calculatePopulation = (res, capacities) => {
     //
     const consumableInfluence = (res.CS + capacities.CS) * 10000/ res.Population;
@@ -89,13 +100,14 @@ const calculateIncomeOnWorld = (settingsPlanet, planet, buildings, blankStorage,
     )
 
 const calculateIncome = (faction) => {
-    const {Resources, Capacities, Usages} = faction;
+    const {Resources, Capacities, Usages, Maps, Income} = faction;
 
     const [unrefined, refined, unique] = split(Object.keys(Resources));
 
     const uniqueIncome = objectMap(defaultResources(unique),
         (_, name) => {
             switch (name) {
+				case "Influence": return calculateInfluence(Resources, Capacities, Maps, Income);
                 case "Population": return calculatePopulation(Resources, Capacities);
                 case "ER": return calculateERIncome(Resources);
                 default: return 0;
