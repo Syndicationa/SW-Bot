@@ -47,7 +47,7 @@ const generateInputs = (command, inputArray = exampleInputs) => {
 }
 
 const retrieveFunction = (input = exampleInputs) => {
-    switch (type) {
+    switch (input.type) {
         case "String":
             return (option, name) => option.getString(name) ?? input.default
         case "Integer":

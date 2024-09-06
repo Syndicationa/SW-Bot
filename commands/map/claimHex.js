@@ -4,6 +4,7 @@ const { db } = require('../../firebase');
 const { getFaction, setFaction, claimPlace } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { updateIncome } = require('../../functions/functions');
+const { subResources } = require('../../functions/incomeMath');
 
 const claimLog = log('claim');
 
@@ -46,6 +47,15 @@ const runClaim = async (interaction) => {
         return;
     }
 
+    const resources = factionData.Resources;
+	const newResources = subResources(resources, {Influence: count*20})
+    if (newResources.Influence < 0) {
+        error = 'Not enough Influence';
+        claimLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
+
     const newMaps = {
         ...factionData.Maps, 
         [place]: {
@@ -55,22 +65,8 @@ const runClaim = async (interaction) => {
             Hexes: (factionData.Maps[place]?.Hexes ?? 0) + count,
         }
     };
-	const resources = factionData.Resources;
-	const newResources = {};
-	const capacities = factionData.Capacities;
-	const newCapacities = {};
-	
-	newResources[`Influence`] = resources[`Influence`] - count * 20;
-	newCapacities[`PB`] = capacities[`PB`] + count;
-	
-	if (newResources[`Influence`] < 0) {
-        error = 'Not enough Influence';
-        claimLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
-	setFaction(server, faction, {Capacities: {...capacities, ...newCapacities}});
-	setFaction(server, faction, {Resources: {...resources, ...newResources}});
+
+	setFaction(server, faction, {Resources: newResources});
     setFaction(server, faction, {Maps: newMaps});
     claimPlace(server, place, count);
     await interaction.reply(`${faction} has claimed ${count} on ${place}`);

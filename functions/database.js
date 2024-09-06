@@ -105,7 +105,7 @@ const { getFactionStats } = require('./income');
 const run = async () => {
     await setDatabase();
     
-    const fileName = `./database10.txt`
+    const fileName = `./database/database11.txt`
     fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
 
     printDatabase();
@@ -114,7 +114,7 @@ const run = async () => {
 const saveToDatabase = async () => {
     await setDatabase();
 
-    const data = fs.readFileSync('./database10.txt', "utf8", () => {});
+    const data = fs.readFileSync('./database/database11.txt', "utf8", () => {});
     const database = JSON.parse(data);
 
     // const str = "206b 413k CM 207k EL 369k CS 40m Population";
@@ -141,11 +141,11 @@ const saveToDatabase = async () => {
             
             // const {Capacities: CapacitiesP, Storage: StorageP} = getFactionStats(database[server].settings, factionInfo);
 
-            const CapacitiesP = addResources(data.Capacities, {PB: 0});
+            const CapacitiesP = addResources(data.Capacities, {Influence: 0});
             console.log(CapacitiesP);
 
             // const date = Timestamp.fromDate(new Date(Date.UTC(2024, 6, 3)));
-            createFaction(server, faction, {...data, date, Capacities: CapacitiesP});
+            createFaction(server, faction, {...data, date, Capacities: CapacitiesP, Usages: Capacities});
             console.log(`Fixing ${faction}`);
         }
     }
