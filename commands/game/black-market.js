@@ -12,7 +12,7 @@ const randInt = (lower, higher) => Math.floor((Math.random()*(higher-lower)) + l
 const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
 	{name: "choice", description: "What you'd like to purchase", type: "String", required: true,
-		choices: [{name: "1x Pirate Immunity - 10 contraband", value: "immunity"}, {name: "1x Pirate redirection - 15 contraband", value: "redirection"}, {name: "2000 of any resource - 1 contraband", value: "resourceChoice"}]},
+		choices: [{name: "1x Pirate Immunity - 5 contraband", value: "immunity"}, {name: "1x Pirate redirection - 8 contraband", value: "redirection"}, {name: "2500 of any resource - 1 contraband", value: "resourceChoice"}]},
 	{name: "target", description: "Name of the Faction chosen (and location) or abreviated name of the resource", type: "String", required: false},
 ]
 
@@ -39,9 +39,9 @@ const runbMarket = async (interaction) => {
 	let nVal = "";
 	const entry = randInt(0,10);
 	if(entry <= 3) {
-		output = "Entry to the black market denied";
+		output = "Nothing to see here...";
 	}else if (entry == 9) {
-		output = `Entry to the black market denied, ${faction}. You'll pay for trying to infiltrate us!`;
+		output = `Entry denied, ${faction}. You'll pay for trying to infiltrate us!`;
 		nVal = resources[`ER`] - 50000000000;
 		newResources[`ER`] = nVal;
 		setFaction(server, faction, {Resources: {...resources, ...newResources}});
@@ -55,7 +55,7 @@ const runbMarket = async (interaction) => {
 				break;
 			case "resourceChoice":
 				output = `${faction} traded 1 contraband for 2000 ${target} at the black market, well, for most of it at least.`;
-				nVal = resources[target] + randInt(1500, 2000);
+				nVal = resources[target] + randInt(2000, 2500);
 				newResources[target] = nVal;
 				setFaction(server, faction, {Resources: {...resources, ...newResources}});
 				break;
