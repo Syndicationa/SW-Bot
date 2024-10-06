@@ -40,7 +40,7 @@ const runbMarket = async (interaction) => {
 	const entry = randInt(0,10);
 	if(entry <= 3) {
 		output = "Nothing to see here...";
-	}else if (entry == 9) {
+	}else if (entry === 9) {
 		output = `Entry denied, ${faction}. You'll pay for trying to infiltrate us!`;
 		nVal = resources[`ER`] - 50000000000;
 		newResources[`ER`] = nVal;

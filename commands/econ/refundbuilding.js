@@ -6,7 +6,8 @@ const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { objectMap, objectReduce } = require('../../functions/functions');
 const { getFactionStats } = require('../../functions/income');
-const { countBuildings, scaleResources, maxResources, equResources, roundResources, addResources, buildingScale } = require('../../functions/incomeMath');
+const { countBuildings, scaleResources, maxResources, equResources, roundResources, addResources } = require('../../functions/resourceMath');
+const { buildingScale } = require('../../functions/incomeMath');
 
 const buyLog = log('refund')
 
@@ -49,14 +50,17 @@ const runRefund = async (interaction) => {
         error = 'Location not found';
         buyLog({arguments, error});
         await interaction.reply(error);
+        return;
     } else if (place === undefined || place.Hexes === 0) {
         error = "No hexes in place";
         buyLog({arguments, error});
         await interaction.reply(error);
+        return;
     } else if (amount > place.Buildings[index][level]) {
         error = "Not enough buildings";
         buyLog({arguments, error});
         await interaction.reply(error);
+        return;
     }
 
     const buildingCount = objectReduce(factionData.Maps, (a, p) => a + p.Buildings.reduce((a, b) => a + countBuildings(b), 0),0);

@@ -6,7 +6,8 @@ const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { objectMap, objectReduce } = require('../../functions/functions');
 const { getFactionStats } = require('../../functions/income');
-const { countBuildings, scaleResources, subResources, minResources, maxResources, equResources, roundResources, buildingCost } = require('../../functions/incomeMath');
+const { countBuildings, scaleResources, subResources, maxResources, equResources, roundResources } = require('../../functions/resourceMath');
+const { buildingCost } = require('../../functions/incomeMath');
 
 const buyLog = log('buy')
 

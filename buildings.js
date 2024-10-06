@@ -44,7 +44,7 @@ const producers = (res, type) => {
             CS: 0, "U-CS": 0,
             EL: 0, "U-EL": 0,
             Production: 0,
-            [res]: 1000
+            [res]: type === "Extractor" ? 1000 : 2000
         }
     };
 };

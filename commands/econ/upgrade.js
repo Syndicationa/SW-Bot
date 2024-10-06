@@ -5,7 +5,7 @@ const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { objectMap } = require('../../functions/functions');
-const { calculateCapacities, countBuildings, scaleResources, maxResources, subResources, equResources, roundResources } = require('../../functions/incomeMath');
+const { countBuildings, scaleResources, maxResources, subResources, equResources, roundResources } = require('../../functions/resourceMath');
 const { getFactionStats } = require('../../functions/income');
 
 const buyLog = log('buy')

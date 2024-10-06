@@ -1,5 +1,6 @@
 const { db } = require('../firebase');
-const {calculateIncome, minResources, maxResources, addResources} = require('./incomeMath');
+const { minResources, maxResources, addResources, subResources, validResources} = require('./resourceMath');
+const { calculateIncome } = require('./incomeMath');
 
 let database;
 
@@ -45,6 +46,8 @@ const getFactionNames = (server, f = () => true, addData = a => a) => {
                 .map((name) => addData(name, serverData[name]));
 }
 
+const getFactions = (server) => database[server];
+
 const setFaction = (server, faction, newData) => {
     database[server][faction.toLowerCase()] = {...database[server][faction.toLowerCase()],...newData};
     db.collection(server).doc(faction.toLowerCase()).update(newData);
@@ -56,7 +59,7 @@ const createFaction = (server, faction, data) => {
 }
 
 const deleteFaction = (server, faction) => {
-    if (faction.toLowerCase() === "settings") return;
+    if (faction.toLowerCase() === "settings" || faction.toLowerCase() === "name") return;
     delete database[server][faction.toLowerCase()]
     db.collection(server).doc(faction.toLowerCase()).delete();
 }
@@ -76,7 +79,7 @@ const deletePlace = (server, place) => {
     
     const factionNames = Object.keys(serverData);
     factionNames.forEach((faction) => {
-        if (faction === "settings") return;
+        if (faction === "settings" || faction === "data") return;
         const factionData = serverData[faction];
 
         const zeroedMap = {...factionData.Maps, [place]: 0};
@@ -93,7 +96,7 @@ const deletePlace = (server, place) => {
     serverDB.doc("settings").set(serverData.settings);
 }
 
-module.exports = {getFaction, getServers, getFactionNames, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace};
+module.exports = {getFaction, getServers, getFactionNames, getFactions, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace};
 
 const fs = require('node:fs');
 const FirebaseFirestore = require("@google-cloud/firestore");
@@ -101,20 +104,41 @@ const { defaultResources, splitCurrency, convertToObject } = require('./currency
 const buildings = require("../buildings");
 const { Timestamp } = require('firebase-admin/firestore');
 const { getFactionStats } = require('./income');
+const { split } = require('./functions');
+
+const file = "./database/database20.txt"
 
 const run = async () => {
     await setDatabase();
     
-    const fileName = `./database/database11.txt`
+    const fileName = file
     fs.appendFile(fileName, JSON.stringify(database), (e) => {console.log(e)});
 
     printDatabase();
 }
 
+const addData = async () => {
+    await setDatabase();
+    createFaction("The Solar Wars", "Data", {
+        Pacts: {
+            Active: [],
+            Pending: []
+        },
+        Wars: {
+            Active: [],
+            Pending: []
+        },
+        Trades: {
+            Active: [],
+            Pending: []
+        },
+    })
+}
+
 const saveToDatabase = async () => {
     await setDatabase();
 
-    const data = fs.readFileSync('./database/database11.txt', "utf8", () => {});
+    const data = fs.readFileSync(file, "utf8", () => {});
     const database = JSON.parse(data);
 
     // const str = "206b 413k CM 207k EL 369k CS 40m Population";
@@ -129,28 +153,48 @@ const saveToDatabase = async () => {
             if (faction === "settings") {
                 // createFaction(server, faction, data);
                 continue;
+            } else if (faction === "data") {
+                const {_seconds, _nanoseconds} = data.date;
+                const date = new Timestamp(_seconds, _nanoseconds);
+                createFaction(server, faction, {...data, date});
+                continue;
             }
+
+            // const caps = data.Capacities;
+            // const [unrefined, refined, unique] = split(Object.keys(caps));
+
+            // const unrefinedCaps = unrefined.reduce((acc, name) => {return {...acc, [name.slice(2)]: caps[name]}},{});
+            // const refinedCaps = refined.reduce((acc, name) => {return {...acc, [name]: caps[name]}}, {});
+
+            // const net = subResources(refinedCaps, unrefinedCaps);
+
+            // if (!validResources(net)) console.log(`${faction} - CM: ${net.CM} CS: ${net.CS} EL: ${net.EL}`);
+
             // const Resources = addResources(resourceObject, {ER: data.Resources.ER});
             // const Storage = defaultResources(database[server].settings.Storage);
-            const Capacities = defaultResources(database[server].settings.Capacities);
+            // const Capacities = defaultResources(database[server].settings.Capacities);
             // const Buildings = buildings;
-            const {_seconds, _nanoseconds} = data.date;
-            const date = new FirebaseFirestore.Timestamp(_seconds, _nanoseconds);
+
+            // if (faction === "alaska") {
+            //     const Capacities = defaultResources(database[server].settings.Capacities);
+            //     createFaction(server, faction, {...data, date, Usages: Capacities});
+            //     continue;
+            // }
 
             // const factionInfo = {...data};
             
             // const {Capacities: CapacitiesP, Storage: StorageP} = getFactionStats(database[server].settings, factionInfo);
 
-            const CapacitiesP = addResources(data.Capacities, {Influence: 0});
-            console.log(CapacitiesP);
+            // const CapacitiesP = addResources(data.Capacities, {Influence: 0});
+            // console.log(CapacitiesP);
 
-            // const date = Timestamp.fromDate(new Date(Date.UTC(2024, 6, 3)));
-            createFaction(server, faction, {...data, date, Capacities: CapacitiesP, Usages: Capacities});
-            console.log(`Fixing ${faction}`);
+            createFaction(server, faction, data);
+            // console.log(`Fixing ${faction}`);
         }
     }
     console.log("Hopefully done!")
 }
 
 // run();
+// addData();
 // saveToDatabase();

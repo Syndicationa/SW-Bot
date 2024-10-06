@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 const { getFaction, setFaction, claimPlace } = require('../../functions/database');
 const { log } = require('../../functions/log');
-const { countBuildings } = require('../../functions/incomeMath');
+const { countBuildings } = require('../../functions/resourceMath');
 
 const claimLog = log('claim');
 

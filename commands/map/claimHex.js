@@ -3,8 +3,7 @@ const {generateInputs, retrieveInputs} = require('../../functions/createInputs')
 const { db } = require('../../firebase');
 const { getFaction, setFaction, claimPlace } = require('../../functions/database');
 const { log } = require('../../functions/log');
-const { updateIncome } = require('../../functions/functions');
-const { subResources } = require('../../functions/incomeMath');
+const { subResources } = require('../../functions/resourceMath');
 
 const claimLog = log('claim');
 

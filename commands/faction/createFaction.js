@@ -4,6 +4,7 @@ const { splitCurrency, convertToObject } = require('../../functions/currency');
 const { getFaction, createFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { Timestamp } = require('firebase-admin/firestore');
+const buildings = require('../../buildings');
 
 const createLog = log('create');
 
@@ -17,7 +18,7 @@ const createEmptyData = (resources) => resources.reduce((acc, v) => {return {...
 const runCreate = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
     const {faction} = arguments;
-    const treasury = arguments.treasury ?? "281b 466k CM 233k EL 441 CS 40m Population";
+    const treasury = arguments.treasury ?? "281b 413k CM 207k EL 369k CS 40m Population";
 
     let error = '';
     const server = interaction.guild.name;
@@ -55,12 +56,13 @@ const runCreate = async (interaction) => {
     const today = new Date();
 
     createFaction(server, faction, {
-        Resources: {...resources, ...newResources}, 
+        Resources: resources, 
         Storage: createEmptyData(settings.Storage),
+        Capacicies: createEmptyData(settings.Capacicies),
+        Usages: createEmptyData(settings.Capacicies),
         Maps: genericMaps,
-        date: Timestamp.fromDate(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))),
         Vehicles: [],
-        Buildings: [],
+        Buildings: buildings,
         Fleets: [],
         Missions: []
     });

@@ -6,31 +6,33 @@ const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
 const {handleReturnMultiple } = require('../../functions/currency');
 const {objectMap} = require('../../functions/functions');
-const { calculateIncome, equResources } = require('../../functions/incomeMath');
+const { calculateIncome } = require('../../functions/incomeMath');
+const { equResources } = require('../../functions/resourceMath');
 const { getFactionStats } = require('../../functions/income');
 
 const incomeLog = log('income');
 
 const inputs = [
     {name: "faction", description: "Faction to collect Income", type: "String", required: true},
+    {name: "trade", description: "Include Trades", type: "Boolean", required: false, default: true}
 ]
 
-const week = (7 * 24 * 60 * 60 * 1000);
-
+const incomePeriod = (5 * 24 * 60 * 60 * 1000);
 
 
 const runIncome = async (interaction) => {
-    const {faction} = retrieveInputs(interaction.options, inputs);
+    const {faction, trade} = retrieveInputs(interaction.options, inputs);
     const server = interaction.guild.name;
     const name = interaction.user.username;
 
     const settings = await getFaction(server, "Settings");
+    const data = await getFaction(server, "Data");
 
     if (faction === "RCalc" && (name === "fer.0" || name === "syndicationus")) {
         await interaction.deferReply();
         const factions = getFactionNames(server);
         const outcomes = factions.map(async (factionName) => {
-            if (factionName === "settings") return "";
+            if (factionName === "settings" || factionName === "data") return "";
             const faction = await getFaction(server, factionName);
             if (faction.Maps === undefined) return;
             
@@ -45,7 +47,7 @@ const runIncome = async (interaction) => {
             return factionName;
         });
 
-        let outcome = (await Promise.all(outcomes)).join("\n");
+        let outcome = (await Promise.all(outcomes)).filter(str => str.length > 0 ).join("\n");
         if (outcome.match(/./g) === null) outcome = "No Factions Modified"
         await interaction.editReply(outcome);
         return;
@@ -58,11 +60,14 @@ const runIncome = async (interaction) => {
         return;
     }
 
-    const income = calculateIncome(factionData);
-    console.log(income);
-    const lastDate = factionData.date.toDate();
+    const trades = data.Trades.Active;
 
-    const nextDate = new Date(lastDate.getTime() + week);
+    const income = calculateIncome(factionData, trades, faction, trade);
+    console.log(income);
+
+    const lastDate = data.date.toDate();
+    const nextDate = new Date(lastDate.getTime() + incomePeriod);
+
     await interaction.reply(
         `${faction} claimed income on ${lastDate.getUTCFullYear()}/${lastDate.getUTCMonth()+1}/${lastDate.getUTCDate()}, 
         will claim on ${nextDate.getUTCFullYear()}/${nextDate.getUTCMonth()+1}/${nextDate.getUTCDate()}, 
