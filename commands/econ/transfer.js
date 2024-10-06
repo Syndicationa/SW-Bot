@@ -65,7 +65,7 @@ const runTransfer = async (interaction) => {
         
         if (nSVal < 0) {
             error = 'Not enough funds';
-            buyLog({arguments, error});
+            transferLog({arguments, error});
             await interaction.reply(error);
             return;
         }
