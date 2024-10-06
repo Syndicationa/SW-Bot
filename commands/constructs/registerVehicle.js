@@ -4,6 +4,7 @@ const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { log } = require('../../functions/log');
 const { splitCurrency } = require('../../functions/currency');
+const { generateNextID } = require('../../functions/fleets');
 
 const regVLog = log('registerVehicle');
 
@@ -14,7 +15,7 @@ const inputs = [
     {name: "year", description: "Date of creation", type: "Integer", required: true},
     {name: "month", description: "Date of creation", type: "Integer", required: true},
     {name: "day", description: "Date of creation", type: "Integer", required: true},
-    {name: "count", description: "Starting Count", type: "Integer", required: false}
+    {name: "count", description: "Starting Count", type: "Integer", required: false, default: 0}
 ]
 
 const runRegisterVehicle = async (interaction) => {
@@ -60,16 +61,18 @@ const runRegisterVehicle = async (interaction) => {
         calcCosts[resourceName] = nVal;
     })
 
+    const newID = generateNextID(factionData.Vehicles);
+
     const newVehicles = [
         ...factionData.Vehicles,
-        {date: newTimestamp, name, cost: calcCosts, count: count ?? 0}
+        {date: newTimestamp, name, cost: calcCosts, count: count, ID: newID}
     ]
 
     setFaction(server, faction, {Vehicles: newVehicles});
     await interaction.reply(`${faction} has added the ${name} to its arsenal`);
 }
 
-const command = new SlashCommandBuilder().setName('registervehicle').setDescription('Register a new vehicle');
+const command = new SlashCommandBuilder().setName('register-vehicle').setDescription('Register a new vehicle');
 generateInputs(command, inputs);
 
 const setdate = {

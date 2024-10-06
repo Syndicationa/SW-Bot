@@ -2,36 +2,36 @@ const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
 
 const inputs = [
-    {name: "length", description: "Length of the Ship", type: "Number", required: true},
+    {name: "length", description: "Length of vehicle", type: "Number", required: true},
 
-    {name: "armor", description: "Specify type of armor", type: "String", required: false, 
-        choices: [{name: "Heavy", value: "heavy"}, {name: "Medium", value: "medium"}, {name: "Light", value: "light"}, {name: "None", value: "none"}]},
-    {name: "protection", description: "Active Protection Systems", type: "String", required: false, 
-        choices: [{name: "Hard Kill", value: "hard"}, {name: "Soft Kill", value: "soft"}, {name: "Both", value: "both"}, {name: "None", value: "none"}]},
+    {name: "armor", description: "Level of armor", type: "String", required: false,
+        choices: [{name: "None", value: "none"}, {name: "Light", value: "light"}, {name: "Medium", value: "medium"}, {name: "Heavy", value: "heavy"}], default: "none"},
+    
+    {name: "protection", description: "Active Protection System", type: "String", required: false,
+        choices: [{name: "None", value: "none"}, {name: "Soft Kill APS", value: "soft"}, {name: "Hard Kill APS", value: "hard"}, {name: "Soft and Hard Kill APS", value: "both"}], default: "none"},
 
-    {name: "heavy", description: "Heavy Weapon Count", type: "Integer", required: false},
-    {name: "medium", description: "Medium Weapon Count", type: "Integer", required: false},
-    {name: "light", description: "Light Weapon Count", type: "Integer", required: false},
-    {name: "rocket", description: "Unguided Rocket Weapon Count", type: "Integer", required: false},
-
-	{name: "systems", description: "Additional systems", type: "Integer", required: false},
+    {name: "heavy", description: "Heavy Armament, includes cannons 100mm and above, rockets 130mm and above, long range missiles", type: "Integer", required: false, default: 0},
+    {name: "medium", description: "Medium Armament, includes cannons up to 99mm, short range missiles", type: "Integer", required: false, default: 0},
+    {name: "light", description: "Light Armament, includes machine guns, grenade launchers up to 40mm", type: "Integer", required: false, default: 0},
+    {name: "rocket", description: "Rocket Armament, unguided rockets up to 130mm caliber", type: "Integer", required: false, default: 0},
+    {name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
 ]
 
-const command = new SlashCommandBuilder().setName('ground-rate').setDescription('Rate Ground Vehicle');
+const command = new SlashCommandBuilder().setName('ground-rate').setDescription('Rate Ground Vehicles (no trains, sorry)');
 generateInputs(command, inputs);
 
 const armorCosts = { //Costs are seemingly inverted
-    heavy: {ER: 24},
-    medium: {ER: 26},
-    light: {ER: 40},
-    none: {ER: 100}
+    heavy: {ER: 24, CM: 9, EL: 3, CS: 4},
+    medium: {ER: 26, CM: 5, EL: 2, CS: 3},
+    light: {ER: 40, CM: 3, EL: 1.25, CS: 2},
+    none: {ER: 100, CM: 2, EL: 1, CS: 1}
 }
 
 const protectionCosts = { //Not inverted
-    both: {ER: 0.3},
-    hard: {ER: 0.15},
-    soft: {ER: 0.1},
-    none: {ER: 0}
+    both: {ER: 0.3, CM: 2, EL: 2.5},
+    hard: {ER: 0.15, CM: 1, EL: 1},
+    soft: {ER: 0.1, CM: 0.5, EL: 1.5},
+    none: {ER: 0, CM: 0, EL: 0}
 }
 
 const er = (values) => {
@@ -41,131 +41,96 @@ const er = (values) => {
         (heavy > 0) ? 7 :
         (medium > 0) ? 3 : 0;
 
-    const armorValue = armorCosts[armor].ER;
-    const lengthCost = length**2 / (armorValue - weaponSystemCost);
+    const lengthCostER = length**2 / (armorCosts[armor].ER - weaponSystemCost);
 
-    const heavyCost = heavy*0.9;
-    const mediumCost = medium*0.3;
-    const lightCost = light*0.03;
-    const rocketCost = rocket*0.08;
+    const heavyCostER = heavy*0.9;
+    const mediumCostER = medium*0.3;
+    const lightCostER = light*0.03;
+    const rocketCostER = rocket*0.08;
 
-    const systemCost = 1 + systems*0.1 + protectionCosts[protection].ER;
+    const systemCostER = 1 + systems*0.1 + protectionCosts[protection].ER;
 
-    return lengthCost + heavyCost + mediumCost + lightCost + rocketCost + systemCost;
+    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER)*20) / 20;
 }
 
 const cm = (values) => {
-    return 0;
-    // const {
-    //     length, main, secondary, 
-    //     lances, pdc, torpedoes, 
-    //     shield, stealth, 
-    //     systems, engines, ftl, 
-    //     cargo, drone, other} = values;
-    // const ftlModifier = ftl === "NONE" ? 0 : (ftl === "INT" ? 6 : 4); 
-    // const lCost = length*(5 + (stealth ? 2: 0) + ftlModifier);
+    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+
+    const lengthCostCM = length**2 / 85 + armorCosts[armor].CM + protectionCosts[protection].CM;
     
-    // const mCost = main*10;
-    // const seCost = secondary*5;
-    // const lanCost = lances*30;
-    // const pCost = pdc*2.5;
-    // const tCost = torpedoes*2.5;
-    
-    // const sCost = shield ? 100:0;
-	// const sysCost = systems * length / 10;
+    const heavyCostCM = heavy*1;
+    const mediumCostCM = medium*0.2;
+    const lightCostCM = light*0.03;
+    const rocketCostCM = rocket*0.1;
 
-    // const cargoCost = cargo * 5;
-    // const droneDiscount = drone ? 1.2:1;
+    const systemCostCM = systems*0.1 + 1;
 
-    // const engineCosts = {S: 5, M: 7, L: 10};
-    // const engineCost = engines.reduce((acc, [count, type]) => 
-    //     (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);
-
-    // return (lCost + mCost + seCost + lanCost + pCost + tCost + sCost + sysCost + engineCost + cargoCost)*droneDiscount;
+    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM)*2) / 2;
 }
 
 const el = (values) => {
-    return 0;
-    // const {
-    //     length, main, secondary, 
-    //     lances, pdc, torpedoes, 
-    //     shield, stealth, 
-    //     systems, engines, ftl, 
-    //     cargo, drone, other} = values;
-    //     const ftlModifier = ftl === "None" ? 0 : (ftl === "INT" ? 2 : 1);  
-    // const lCost = length*((stealth ? 1: 0) + ftlModifier);
+    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+
+    const lengthCostEL = 0.3*(length**2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
     
-    // const mCost = main*10;
-    // const seCost = secondary*10;
-    // const lanCost = lances*20;
-    // const pCost = pdc*10;
-    // const tCost = torpedoes*10;
-    
-    // const sCost = shield ? 100:0;
-	// const sysCost = systems * length/5;
+    const heavyCostEL = heavy*0.6;
+    const mediumCostEL = medium*1;
+    const lightCostEL = light*0.02;
+    const rocketCostEL = rocket*0.02;
 
-    // const cargoCost = cargo * 2;
-    // const droneDiscount = drone ? 1.5:1;
+    const systemCostEL = systems*0.15 + 1;
 
-    // const engineCosts = {S: 5, M: 7, L: 10};
-    // const engineCost = engines.reduce((acc, [count, type]) => 
-    //     (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);
-
-    // return (lCost + mCost + seCost + lanCost + pCost + tCost + sCost + sysCost + engineCost + cargoCost)*droneDiscount;
+    return Math.ceil(systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*2) / 2;
 }
 
-const cs = (values) => {
-    return 0;
-    // const {
-    //     length, main, secondary, 
-    //     lances, pdc,
-    //     systems, engines, ftl, 
-    //     drone} = values;
-    // const ftlModifier = ftl === "NONE" ? 0: 1; 
-    // const lCost = length*(0.5 + ftlModifier);
+const cs = (values, costCM, costEL) => {
+    const {armor, heavy, medium, light, rocket, systems} = values;
     
-    // const mCost = main*1;
-    // const seCost = secondary*1;
-    // const lanCost = lances*2;
-    // const pCost = pdc*1;
+    const CSCostID = 
+        (heavy > 0 || rocket > 0) ? 4 :
+        (medium > 0) ? 3 :
+        (light > 0) ? 2 : 1;
+    
+    const lengthCostCS =
+        (CSCostID === 4 || armorCosts[armor].CS === 4) ? 5 :
+        (CSCostID === 3 || armorCosts[armor].CS === 3) ? 3 :
+        (CSCostID === 2 || armorCosts[armor].CS === 2) ? 1.5 : 1;
 
-	// const sysCost = systems * length / 5;
+    const systemCostCS = systems*0.25;
 
-    // const droneDiscount = drone ? 0.5:1;
-
-    // const engineCosts = {S: 1, M: 2, L: 3};
-    // const engineCost = engines.reduce((acc, [count, type]) => 
-    //     (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);
-
-    // return (lCost + mCost + seCost + lanCost + pCost + sysCost + engineCost)*droneDiscount;
+    return Math.ceil((lengthCostCS + systemCostCS + 0.1*(costCM + costEL))*2)/2;
 }
 
 const rateFunction = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    // const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
     
-    const correctedArmor = armor ?? "none";
-    const correctedProtection = protection ?? "none"
+    // const correctedArmor = armor ?? "none";
+    // const correctedProtection = protection ?? "none"
 
-    const correctedHeavy = heavy ?? 0;
-    const correctedMedium = medium ?? 0;
-    const correctedLight = light ?? 0;
-    const correctedRocket = rocket ?? 0;
+    // const correctedHeavy = heavy ?? 0;
+    // const correctedMedium = medium ?? 0;
+    // const correctedLight = light ?? 0;
+    // const correctedRocket = rocket ?? 0;
 
-	const correctedSystems = systems ?? 0;
+    // const correctedSystems = systems ?? 0;
 
-    const correctedValues = {
-        length, 
-        armor: correctedArmor,
-        protection: correctedProtection, 
-        heavy: correctedHeavy,
-        medium: correctedMedium,
-        light: correctedLight,
-        rocket: correctedRocket,
-        systems: correctedSystems
-    }
 
-    return `This will cost about $${er(correctedValues)} million ER, ${cm(correctedValues)} CM, ${el(correctedValues)} EL, and ${cs((correctedValues))} CS`
-}
+    // const correctedValues = {
+    //     length, 
+    //     armor: correctedArmor,
+    //     protection: correctedProtection, 
+    //     heavy: correctedHeavy,
+    //     medium: correctedMedium,
+    //     light: correctedLight,
+    //     rocket: correctedRocket,
+    //     systems: correctedSystems,
+    // }
+
+    const costCM = cm(values)
+    const costEL = el(values)
+
+    return `This will cost about $${er(values)} million ER, ${costCM} CM, ${costEL} EL, and ${cs(values, costCM, costEL)} CS`
+} 
 
 const ground = {
     data: command,
