@@ -64,15 +64,19 @@ const generateNextPactID = (pactList) => {
 
 const findPact = (list = [templatePact], ID) => list.find(pact => pact.ID === ID);
 
-const calculateCost = (factions, pacts) => {
-    const orderedPacts = pacts.reduce((group, pact) => group[pact.ID] = pact,[]);
+const calculateCost = (factions, pacts, pactData) => {
+    const orderedPacts = []
+    pacts.forEach((pact) => orderedPacts[pact.ID] = pact);
 
     try {
         return factions.map(([name, faction]) => {
+            if (faction?.Pacts === undefined) throw Error("Error")
             const cost = faction.Pacts.reduce((acc, ID) => {
                 const pact = orderedPacts[ID];
-                return acc + pact.Cost.join*pact.Participants.length;
-            });
+                if (pact === undefined) return acc;
+                if (pact.ID === pactData.ID) return acc;
+                return acc + pact.Cost.join*(pact.Participants.length - 1);
+            }, 0) + pactData.Cost.join*(pactData.Participants.length - 1);
 
             const newFaction = {
                 ...faction,
@@ -87,9 +91,10 @@ const calculateCost = (factions, pacts) => {
             const influenceIncome = calculateInfluence(Resources, Usages, Maps);
             
             if (influenceIncome < 0) throw Error(name);
-            return newFaction;
+            return [name, newFaction];
         })
     } catch (e) {
+        if (e.message === "Error") throw Error("Issue with factions");
         return e.message;
     }
 }

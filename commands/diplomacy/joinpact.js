@@ -6,7 +6,7 @@ const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { addResources } = require('../../functions/resourceMath');
 const { calculateIncome } = require('../../functions/incomeMath');
-const { generateNextPactID, makePact, findPact, joinAPact } = require('../../functions/pactsandwar');
+const { generateNextPactID, makePact, findPact, joinAPact, calculateCost } = require('../../functions/pactsandwar');
 
 const joinPactLog = log('joinpact')
 
@@ -45,32 +45,40 @@ const runJoinPact = async (interaction) => {
         return;
     }
 
-    const factions = [...pact.Participants((name) => {
-        const factionData = getFaction(name);
-        return [name, factionData]
-    }), [faction, factionData]];
-
-    const newFactions = calculateCost(factions, [...Active, pact]);
-
-    if (typeof newFactions === 'string') 
-        await interaction.reply({ embeds: new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
-            `${faction} cannot join ${pact.Name}, due to ${newFactions}'s Influence`)});
+    if (pact.Participants.some(member => member === faction.toLowerCase())) {
+        error = `${faction} already member of pact`;
+        joinPactLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
 
     const [success, newPact] = joinAPact(pact, faction);
+    
+    const factions = await Promise.all([...newPact.Participants.map(async (name) => {
+        const factionData = await getFaction(server,name);
+        return [name, factionData]
+    }), [faction, factionData]]);
+
+    const newFactions = calculateCost(factions, [...Active], newPact);
+
+    console.log(Array.isArray(newFactions));
+    
+    if (typeof newFactions === 'string') {
+        await interaction.reply({ embeds: [new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
+            `${faction} cannot join ${pact.Name}, due to ${newFactions}'s Influence`)]});
+        return;
+    }
 
     if (success) {
-        setFaction(server, faction, {
-            Pacts: [...factionData.Pacts, newPact.ID], 
-            Incoming: factionData.Incoming.filter(request => request.Data !== ID)});
-        setFaction(server, "data", {Pacts: {Pending, Active: [...Active, newPact]}});
-
         newFactions.forEach(([name, faction]) => {
             setFaction(server, name, faction);
         });
-
+        
         if (pact.Participants.length === 1) {
             const name = pact.Participants[0];
             const founder = await getFaction(server, name);
+            
+
             if (founder === undefined) {
                 error = 'Pact Founder not found';
                 joinPactLog({arguments, error});
@@ -78,10 +86,17 @@ const runJoinPact = async (interaction) => {
                 return;
             }
             setFaction(server, name, 
-                {Pacts: [...founder.Pacts, ID], Outgoing: founder.Outgoing.filter(request => request.Data !== ID)})
+                {Pacts: [...founder.Pacts, ID], 
+                    Outgoing: founder.Outgoing.filter(request => request.Type !== "Pact" || request.Data !== ID)})
         }
+                
+        setFaction(server, faction, {
+            Pacts: [...factionData.Pacts, newPact.ID], 
+            Incoming: factionData.Incoming.filter(request => request.Data !== ID)});
+
+        setFaction(server, "data", {Pacts: {Pending, Active: [...Active, newPact]}});
         
-        const embed = new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
+                const embed = new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
             `${faction} has joined ${newPact.Name}`
         );
         await interaction.reply({ embeds: [ embed ]});

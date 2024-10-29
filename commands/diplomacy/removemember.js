@@ -6,7 +6,7 @@ const { getFaction, setFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
 const { addResources } = require('../../functions/resourceMath');
 const { calculateIncome } = require('../../functions/incomeMath');
-const { generateNextPactID, makePact, findPact, joinAPact, addMemberToPact, removeFromPact } = require('../../functions/pactsandwar');
+const { generateNextPactID, makePact, findPact, joinAPact, addMemberToPact, removeFromPact, calculateCost } = require('../../functions/pactsandwar');
 
 const removeMemberLog = log('removemember')
 
@@ -45,28 +45,20 @@ const runRemoveMember = async (interaction) => {
         return;
     }
 
-    if (pact.Participants.some(name => name === faction)) {
-        error = 'Faction in pact';
-        removeMemberLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
+    const newPact = removeFromPact(pact, faction.toLowerCase());
 
-    const newPact = removeFromPact(pact, faction);
-
-    if (newPact.Participants.length !== pact.Participants.length || newPact.Incoming.length !== newPact.Incoming.length) {
+    if (newPact.Participants.length !== pact.Participants.length) {
         const newFactionData = {
-            ...factionData,
             Pacts:  factionData.Pacts.filter(pact => pact !== ID), 
             Outgoing: factionData.Outgoing.filter(request => request.Data !== ID),
         };
 
-        const factions = [...pact.Participants((name) => {
-            const factionData = getFaction(name);
+        const factions = await Promise.all([...newPact.Participants.map(async (name) => {
+            const factionData = await getFaction(server,name);
             return [name, factionData]
-        }), [faction, newFactionData]];
+        }), [faction, factionData]]);
     
-        const newFactions = calculateCost(factions, [...activePacts, pact]);
+        const newFactions = calculateCost(factions, [...Active], newPact);
     
         if (typeof newFactions === 'string') return new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
             `${faction} cannot leave ${pact.Name}, due to ${newFactions}'s Influence`
@@ -75,15 +67,17 @@ const runRemoveMember = async (interaction) => {
         newFactions.forEach(([name, faction]) => {
             setFaction(server, name, faction);
         });
+
+        setFaction(server, faction, newFactionData);
     } else 
         setFaction(server, faction, {Incoming: factionData.Incoming.filter(request => request.Data !== ID)});
 
     if (newPact.Participants.length <= 1 && newPact.Incoming.length === 0 && newPact.Outgoing.length === 0) {
-        const name = pact.Participants[0] ?? "None";
+        const name = newPact.Participants[0] ?? "None";
 
         setFaction(server, "data", {Pacts: {Pending, Active}})
 
-        removeFounder(name, newPact, ID);
+        removeFounder(server, name, ID);
     } else if (pact.Participants.length >= 2)
         setFaction(server, "data", {Pacts: {Pending, Active: [...Active, newPact]}});
     else
@@ -95,23 +89,19 @@ const runRemoveMember = async (interaction) => {
     await interaction.reply({ embeds: [ embed ]});
 }
 
-const removeFounder = async (name, pact, ID) => {
+const removeFounder = async (server, name, ID) => {
     if (name === "None") return;
     const founder = await getFaction(server, name);
     if (founder === undefined) {
         error = 'Pact founder not found';
         removeMemberLog({arguments, error});
-        await interaction.reply(error);
-        return;
+        throw Error();
     }
-
-    const newUsages = addResources(founder.Usages, {Influence: -pact.Cost.join});
 
     setFaction(server, name, {
         Pacts:  founder.Pacts.filter(pact => pact !== ID), 
         Incoming: founder.Incoming.filter(request => request.Data !== ID),
         Outgoing: founder.Outgoing.filter(request => request.Data !== ID),
-        Usages: newUsages
     });
 }
 

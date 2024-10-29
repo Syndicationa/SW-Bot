@@ -106,7 +106,7 @@ const { Timestamp } = require('firebase-admin/firestore');
 const { getFactionStats } = require('./income');
 const { split } = require('./functions');
 
-const file = "./database/database20.txt"
+const file = "./database/databaseMergedRAZE.txt"
 
 const run = async () => {
     await setDatabase();
@@ -173,7 +173,7 @@ const saveToDatabase = async () => {
             // const Resources = addResources(resourceObject, {ER: data.Resources.ER});
             // const Storage = defaultResources(database[server].settings.Storage);
             // const Capacities = defaultResources(database[server].settings.Capacities);
-            // const Buildings = buildings;
+            const Buildings = buildings;
 
             // if (faction === "alaska") {
             //     const Capacities = defaultResources(database[server].settings.Capacities);
@@ -188,8 +188,8 @@ const saveToDatabase = async () => {
             // const CapacitiesP = addResources(data.Capacities, {Influence: 0});
             // console.log(CapacitiesP);
 
-            createFaction(server, faction, data);
-            // console.log(`Fixing ${faction}`);
+            createFaction(server, faction, {...data, Buildings});
+            console.log(`Fixing ${faction}`);
         }
     }
     console.log("Hopefully done!")

@@ -34,11 +34,13 @@ const runpirate = async (interaction) => {
 	switch(process){
 		
 		case "roll":
-			const f = factionQualities(undefined);
-			let nations = getFactionNames(interaction.guild.name, f);
-			if(randInt(1,6) == 5)
-			{
+			// const f = factionQualities(undefined);
+			// let nations = getFactionNames(interaction.guild.name, f);
+			let nations = ["mcr", "triad", "cer", "kkw", "arestika"];
+			if(randInt(1,6) === 6) {
 				nations = settings.PlaceList;
+			} else if (randInt(1,5) > 3) {
+				nations = getFactionNames(server);
 			}
 			const chosenOne = nations[randInt(0, nations.length - 1)];
 			titleMessage = ` on ${chosenOne}`;
@@ -109,7 +111,7 @@ const runpirate = async (interaction) => {
 	const embed = new EmbedBuilder().setTitle(`Pirate raid${titleMessage}`).setColor(0x0099FF).setDescription(
 		`${interactionMessage}`).setImage('attachment://pirates.png').setThumbnail('attachment://pirateflag.png').setTimestamp();
 		
-	await interaction.reply({ embeds: [ embed ],files: ['./files/pirates.png', './files/pirateflag.png'] });
+	await interaction.reply({ embeds: [ embed ]});
 }
 
 const command = new SlashCommandBuilder().setName('pirate-raid').setDescription('Manage pirate raids');

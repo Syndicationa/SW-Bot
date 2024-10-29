@@ -7,13 +7,9 @@ const archiveChannel = async (interaction) => {
 
     await interaction.deferReply();
 
-    const messages = await channel.messages.fetch();
+    const messages = await channel.messages.fetch({limit: 100});
     messages.reverse().map(message => {
-        if (message.author.username !== "Syndicationus") {
-            console.log(message.content)
-            return;
-        }
-        console.log(JSON.stringify(message));
+        console.log(`Content: ${message.content} Time: ${message.createdAt}`);
     });
 
     await interaction.editReply("Thanks!");

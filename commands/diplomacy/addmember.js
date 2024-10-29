@@ -82,25 +82,28 @@ const newRequest = (server, faction, factionData, pact) => {
 }
 
 const addingMember = async (server, faction, factionData, pact, activePacts) => {
-    const factions = [...pact.Participants((name) => {
-        const factionData = getFaction(name);
+    const factions = await Promise.all([...pact.Participants.map(async (name) => {
+        const factionData = await getFaction(server,name);
         return [name, factionData]
-    }), [faction, factionData]];
+    }), [faction, factionData]]);
 
-    const newFactions = calculateCost(factions, [...activePacts, pact]);
-
-    if (typeof newFactions === 'string') return new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
-        `${faction} cannot join ${pact.Name}, due to ${newFactions}'s Influence`
-    );
+    const newFactions = calculateCost(factions, [...activePacts], pact);
+    
+    if (typeof newFactions === 'string') {
+        await interaction.reply({ embeds: [new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(
+            `${faction} cannot join ${pact.Name}, due to ${newFactions}'s Influence`)]});
+        return;
+    }
+    
+    newFactions.forEach(([name, faction]) => {
+        setFaction(server, name, faction);
+    });
 
     setFaction(server, faction, {
         Pacts: [...factionData.Pacts, pact.ID], 
         Outgoing: factionData.Outgoing.filter(request => request.Data !== ID) });
     setFaction(server, "data", {Pacts: {Pending, Active: [...Active, pact]}});
 
-    newFactions.forEach(([name, faction]) => {
-        setFaction(server, name, faction);
-    });
 
     if (pact.Participants.length === 1) {
         const name = pact.Participants[0];
@@ -113,7 +116,8 @@ const addingMember = async (server, faction, factionData, pact, activePacts) => 
             return;
         }
         setFaction(server, name, 
-            {Pacts: [...founder.Pacts, ID], Outgoing: founder.Outgoing.filter(request => request.Data !== ID)})
+            {Pacts: [...founder.Pacts, ID], 
+                Outgoing: founder.Outgoing.filter(request => request.Type !== "Pact" || request.Data !== ID)})
     } //Makes pact active for leader
     
     return new EmbedBuilder().setTitle(`Diplomatic Act`).setColor(0x0099FF).setDescription(

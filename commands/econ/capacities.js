@@ -29,7 +29,11 @@ const capacities = {
         }
         const {faction} = retrieveInputs(interaction.options, inputs);
         const outputValue = await getF(interaction.guild.name, faction);
-        await interaction.reply(`${message}\n${faction} ${outputValue}`);
+        try {
+            await interaction.reply(`${message}\n${faction} ${outputValue}`);
+        } catch (error) {
+            console.log(error.message);
+        }
     }
 }
 
