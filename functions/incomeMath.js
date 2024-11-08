@@ -124,7 +124,8 @@ const calculateUniqueIncome = (faction) => {
 }
 
 const fastTrade = (faction, trades, name) => {
-    const orderedTrades = trades.reduce((group, trade) => group[trade.ID] = trade,[]);
+    const orderedTrades = [];
+    trades.forEach((rade) => orderedTrades[trade.ID] = trade);
 
     const resources = 
         faction.Trades.map(id => orderedTrades[id] ?? false).filter(trade => Boolean(trade))
@@ -138,13 +139,12 @@ const fastTrade = (faction, trades, name) => {
 }
 
 const trade = (factionGroup, resources) => {
-    const trades = factionGroup.data.Trades.Active.reduce((group, trade) => group[trade.ID] = trade,[]);
+    const trades = []
+    factionGroup.data.Trades.Active.forEach((trade) => trades[trade.ID] = trade);
     
     const factions = Object.keys(factionGroup).filter(name => name !== "data" && name !== "settings");
     
     const filterResources = (res) => resources.reduce((acc, name) => {return {...acc, [name]: res[name]}}, {})
-    
-    console.log(resources);
 
     const data = factions.reduce((acc,name) => {
         const factionData = factionGroup[name];
@@ -155,7 +155,8 @@ const trade = (factionGroup, resources) => {
                 .map(trade => {
                     const target = Object.keys(trade).filter(key => key !== 'ID' || key === name)[0];
                     return {
-                        ...trade[name], 
+                        ID: trade.ID,
+                        ...trade[name],
                         Resources: filterResources(trade[name].Resources),
                         Debt: trade[name].Debt,
                         Resolved: false,
@@ -213,10 +214,10 @@ const trade = (factionGroup, resources) => {
     } //Add Debt
 
     //Recompile Factions
-    for (let trade in trades) {
+    for (let trade of trades) {
         const [factionA, factionB] = Object.keys(trade).filter(key => key !== 'ID')
-        const factionADebt = data[factionA].Trades.find(a => a.ID = trade.ID).Debt;
-        const factionBDebt = data[factionB].Trades.find(b => b.ID = trade.ID).Debt;
+        const factionADebt = data[factionA].Trades.find(a => a.ID === trade.ID).Debt;
+        const factionBDebt = data[factionB].Trades.find(b => b.ID === trade.ID).Debt;
 
         trade[factionA].Debt = factionADebt;
         trade[factionB].Debt = factionBDebt;
