@@ -57,7 +57,7 @@ const calculateERIncome = (Resources) => {
         : treasury <= 15000000000000 ? (-0.005714*(treasury/1000000000 - 1000)+100)
         : (22 - Math.log10((treasury/1000000000 - 5699))/2)
     const income = percentage/100 * (
-        workingPopulation <= 250000000 ? 245 * workingPopulation/240 *1000 - 5208000000
+        workingPopulation <= 250000000 ? 245 * workingPopulation/210 *1000 - 41666666666
         : 1000000000*((1.7 * Math.log10(workingPopulation + 1))**2 + 46.18193)
     )
 
