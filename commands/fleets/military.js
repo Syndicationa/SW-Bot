@@ -12,11 +12,12 @@ const inputs = [
     {name: "process", description: "Specify recruiting or dimissing troops", type: "String", required: true, 
         choices: [{name: "Recruit", value: "recruit"}, {name: "Dimiss", value: "dimiss"}]},
     {name: "amount", description: "Amount of troops(add a m, b, or t as multipliers, no unit)", type: "String", required: true},
+	{name: "time", description: "Time to finish the process", type: "String", required: true},
 ]
 
 const runrecruit = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
-    const {faction, process, amount} = arguments;
+    const {faction, process, amount, time} = arguments;
     const server = interaction.guild.name;
     let error = "";
 
@@ -73,8 +74,8 @@ const runrecruit = async (interaction) => {
 	
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
-	const embed = new EmbedBuilder().setTitle(`${faction}'s military`).setColor(0x0099FF).setDescription(
-		`${faction} succesfully ${process}ed ${newAmount[0][0]} soldiers.\nThey'll be ready to fight soon.`);
+	const embed = new EmbedBuilder().setTitle(`${faction}'s military`).setColor(0x0099FF).setTimestamp().setDescription(
+		`${faction} succesfully ${process}ed ${newAmount[0][0]} soldiers.\nThey'll be ready to fight in ${time}.\n1 irl week ~~ 3 irp months`);
 		
 	await interaction.reply({ embeds: [ embed ]});
 }
