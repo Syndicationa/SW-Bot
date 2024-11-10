@@ -53,12 +53,12 @@ const calculateERIncome = (Resources) => {
     const treasury = Resources.ER
     const workingPopulation = Resources.Population - Resources.Military
     const percentage = 
-        treasury <= 250000000000 ? 100
-        : treasury <= 15000000000000 ? (-0.0061*(treasury/1000000000 - 250)+100)
-        : (12.0095 - Math.log10((treasury/1000000000 - 5699))/2)
+        treasury <= 1000000000000 ? 100
+        : treasury <= 15000000000000 ? (-0.005714*(treasury/1000000000 - 1000)+100)
+        : (22 - Math.log10((treasury/1000000000 - 5699))/2)
     const income = percentage/100 * (
-        workingPopulation <= 2000000000 ? 125 * workingPopulation
-        : 1000000000*((1.7 * Math.log10(workingPopulation + 1))**2)
+        workingPopulation <= 250000000 ? 245 * workingPopulation/210 *1000 - 41666666666
+        : 1000000000*((1.7 * Math.log10(workingPopulation + 1))**2 + 46.18193)
     )
 
     // console.log(treasury, workingPopulation, percentage, income)
