@@ -23,6 +23,7 @@ const getFactionStats = (settings, faction) => {
 };
 
 const income = async (server) => {
+    console.log(`Performing Income: ${server}`)
     const factionData = getFactions(server);
 
     if (factionData === undefined) {
@@ -52,7 +53,7 @@ const collectIncome = () => {
     const servers = getServers();
     servers.forEach((serverName) => {
         income(serverName);
-    })   
+    })
 }
 
 module.exports = {income, collectIncome, getFactionStats};

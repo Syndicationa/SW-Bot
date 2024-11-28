@@ -11,7 +11,6 @@ const calculateCapacitiesOnWorld = (settingsPlanet, planet, buildings, blankStor
             const capacities = roundResources(addResources(mulResources(scaleResources(buildings[index].capacity, count), scaleResources(settingsPlanet.Resources, 1/100)), acc.capacities));
             const storage = roundResources(addResources(scaleResources(buildings[index].storage, count),acc.storage));
         
-            // console.log(building, buildings[index].capacity, capacities);
             return {storage, capacities};
         }
         , {storage: blankStorage, capacities: blankCapacities}
@@ -21,8 +20,11 @@ const calculateCapacities = (faction, settingMaps, blankStorage, blankCapacities
     const {storage, capacities} = objectReduce(faction.Maps,
         (acc, map, name) => {
             const {storage, capacities} = calculateCapacitiesOnWorld(settingMaps[name], map, faction.Buildings, blankStorage, blankCapacities);
+            const ucs = settingMaps[name].Resources["U-CS"];
+            let population = {Population: map.Hexes * (ucs === 0 ? 0 : ucs < 80 ? 200000 : 300000)};
+
             return {
-                storage: addResources(storage, acc.storage),
+                storage: addResources(addResources(storage, acc.storage), population),
                 capacities: addResources(capacities, acc.capacities)
             }
         },
@@ -88,8 +90,6 @@ const calculateRefinedIncome = (faction, trades, name) => {
             })
             .reduce((acc, trade) => addResources(acc, trade), //Adds all trades to storage for calculation
             {...store, CS: store.CS + CSCost})//Includes CS used by Pop
-    
-    console.log(CSCost);
 
     const [unrefined, refined, unique] = split(Object.keys(Resources));
 
@@ -222,8 +222,6 @@ const trade = (factionGroup, resources) => {
         trade[factionA].Debt = factionADebt;
         trade[factionB].Debt = factionBDebt;
     }
-
-    console.log(data.milita.Resources);
 
     const newFactionGroup = objectMap(factionGroup, (factionData, name) => {
         if (name === 'settings') return factionData;

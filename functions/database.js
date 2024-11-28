@@ -106,7 +106,7 @@ const { Timestamp } = require('firebase-admin/firestore');
 const { getFactionStats } = require('./income');
 const { split } = require('./functions');
 
-const file = "./database/databaseMergedRAZE.txt"
+const file = "./database/database26.txt"
 
 const run = async () => {
     await setDatabase();
@@ -151,6 +151,9 @@ const saveToDatabase = async () => {
         for (faction in database[server]) {
             const data = database[server][faction]
             if (faction === "settings") {
+                // for (const each in data.Places) {
+                //     console.log(each);
+                // }
                 // createFaction(server, faction, data);
                 continue;
             } else if (faction === "data") {
@@ -183,12 +186,12 @@ const saveToDatabase = async () => {
 
             // const factionInfo = {...data};
             
-            // const {Capacities: CapacitiesP, Storage: StorageP} = getFactionStats(database[server].settings, factionInfo);
+            const {Capacities, Storage} = getFactionStats(database[server].settings, data);
 
             // const CapacitiesP = addResources(data.Capacities, {Influence: 0});
             // console.log(CapacitiesP);
 
-            createFaction(server, faction, {...data, Buildings});
+            createFaction(server, faction, {...data, Buildings, Capacities, Storage});
             console.log(`Fixing ${faction}`);
         }
     }

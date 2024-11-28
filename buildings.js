@@ -2,9 +2,9 @@ const city = {
     name:"City",
     date:{_seconds:1718496000,_nanoseconds:0},
     cost:{
-        CM: 2000, "U-CM": 0,
-        CS: 2000, "U-CS":0,
-        EL: 1000, "U-EL":0,
+        CM: 500, "U-CM": 0,
+        CS: 500, "U-CS":0,
+        EL: 250, "U-EL":0,
         Population: 0, Military: 0,
         ER: 1000000000, Influence: 0,
     },
@@ -12,7 +12,7 @@ const city = {
         CM: 0, "U-CM": 0,
         CS: 0, "U-CS": 0,
         EL: 0, "U-EL": 0,
-        Population: 2000000,
+        Population: 500000,
         },
     capacity:{
         CM: 0, "U-CM": 0,

@@ -25,7 +25,7 @@ const runCeres = async (interaction) => {
     
     const gain = choice;
 	
-	const costs = splitCurrency(payment).filter(([_, name]) => name === "EL" || name === "CM" || name === "CS")
+	const costs = splitCurrency(payment).filter(([_, name]) => name === "EL" || name === "CM" || name === "CS").map(([val, name]) => [val - (val % 4), name]);
 
     const NaNcosts = costs.some((cost) => isNaN(cost[0]));
     const isValidType = costs.every((cost) => settings.Resources.indexOf(cost[1]) >= 0)
