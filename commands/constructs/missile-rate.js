@@ -16,22 +16,22 @@ const command = new SlashCommandBuilder().setName('missile-rate').setDescription
 generateInputs(command, inputs);
 
 const typeCosts = { //Costs are seemingly inverted
-    interceptor: {ER: 5, CM: 3000, EL: 2000, CS: 2000},
-    ballistic: {ER: 70, CM: 10000, EL: 6000, CS: 7000},
-    ip: {ER: 100, CM: 10000, EL: 7000, CS: 8000},
-    gto: {ER: 70, CM: 5000, EL: 6000, CS: 5000},
-	cruise: {ER: 2, CM: 1000, EL: 2000, CS: 1000}
+    interceptor: {ER: 4.2, CM: 2.3, EL: 1.9, CS: 1.8},
+    ballistic: {ER: 67, CM: 8.9, EL: 5.2, CS: 6.2},
+    ip: {ER: 79, CM: 8.7, EL: 6.5, CS: 7.2},
+    gto: {ER: 67, CM: 4.5, EL: 5.4, CS: 4.2},
+	cruise: {ER: 1.5, CM: 4.5, EL: 1.3, CS: 0.6}
 }
 
 const er = (values) => {
     const {length, type, nuclear, systems, name} = values;
 
 
-    const lengthCostER = length*2;
+    const lengthCostER = length*1.7;
 
     const typeCostER = typeCosts[type].ER;
 
-    const nuclearER = nuclear*7;
+    const nuclearER = nuclear*8.6;
 
     return Math.ceil(lengthCostER+typeCostER+nuclearER);
 }
@@ -40,11 +40,11 @@ const cm = (values) => {
     const {length, type, nuclear, systems, name} = values;
 
 
-    const lengthCostCM = length*500;
+    const lengthCostCM = length*0.38;
 
     const typeCostCM = typeCosts[type].CM;
 
-    const nuclearCM = nuclear*1300;
+    const nuclearCM = nuclear*1.6;
 
     return Math.ceil(lengthCostCM+typeCostCM+nuclearCM);
 }
@@ -54,9 +54,9 @@ const el = (values) => {
 
     const typeCostEL = typeCosts[type].EL;
 
-    const nuclearEL = nuclear*1000;
+    const nuclearEL = nuclear*0.8;
 	
-	const systemsEL = 0.3*typeCosts[type].EL*systems;
+	const systemsEL = 0.25*typeCosts[type].EL*systems;
 	
     return Math.ceil(typeCostEL+nuclearEL+systemsEL);
 }
@@ -65,11 +65,11 @@ const cs = (values) => {
     const {length, type, nuclear, systems, name} = values;
 
 
-    const lengthCostCS = length*200;
+    const lengthCostCS = length*0.16;
 
     const typeCostCS = typeCosts[type].CS;
 
-    const nuclearCS = nuclear*400;
+    const nuclearCS = nuclear*0.35;
 
     return Math.ceil(lengthCostCS+typeCostCS+nuclearCS);
 
