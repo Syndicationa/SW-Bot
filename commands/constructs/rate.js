@@ -22,6 +22,7 @@ const inputs = [
     {name: "cargo", description: "Amount of cargo space (1 unit per meter)", type: "Integer", required: false},
     {name: "drone", description: "Is a drone", type: "Boolean", required: false},
     {name: "other", description: "Other Costs", type: "Integer", required: false},
+	{name: "name", description: "Name", type: "String", required: false, default: 'ship'},
 ]
 
 const command = new SlashCommandBuilder().setName('ship-rate').setDescription('Rate Spacecraft');
@@ -146,7 +147,7 @@ const rateFunction = (values) => {
         lances, pdc, torpedoes, 
         shield, stealth, 
         systems, engines, ftl, 
-        cargo, drone, other} = values;
+        cargo, drone, other, name} = values;
     
     const correctedFTL = ftl ?? "NONE";
     const correctedStealth = stealth ?? false
@@ -182,7 +183,7 @@ const rateFunction = (values) => {
         other: correctedOther,
     }
 
-    return `This will cost about $${er(correctedValues)} billion ER, ${cm(correctedValues)} CM, ${el(correctedValues)} EL, and ${cs((correctedValues))} CS`
+    return `The ${name} will cost about $${er(correctedValues)} billion ER, ${cm(correctedValues)*1000} CM, ${el(correctedValues)*1000} EL, and ${cs((correctedValues))*1000} CS. It will have an upkeep of ${Math.ceil(cs((correctedValues))*1000/6)} CS.`
 }
 
 const rate = {

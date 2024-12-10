@@ -15,6 +15,7 @@ const inputs = [
     {name: "light", description: "Light Armament, includes machine guns, grenade launchers up to 40mm", type: "Integer", required: false, default: 0},
     {name: "rocket", description: "Rocket Armament, unguided rockets up to 130mm caliber", type: "Integer", required: false, default: 0},
     {name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
+	{name: "name", description: "Name", type: "String", required: false, default: 'missile'},
 ]
 
 const command = new SlashCommandBuilder().setName('ground-rate').setDescription('Rate Ground Vehicles (no trains, sorry)');
@@ -102,7 +103,7 @@ const cs = (values, costCM, costEL) => {
 }
 
 const rateFunction = (values) => {
-    // const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {name} = values;
     
     // const correctedArmor = armor ?? "none";
     // const correctedProtection = protection ?? "none"
@@ -129,7 +130,7 @@ const rateFunction = (values) => {
     const costCM = cm(values)
     const costEL = el(values)
 
-    return `This will cost about $${er(values)} million ER, ${costCM} CM, ${costEL} EL, and ${cs(values, costCM, costEL)} CS`
+    return `The ${name} will cost about $${er(values)} million ER, ${costCM*200} CM, ${costEL*200} EL, and ${cs(values, costCM, costEL)*200} CS. It will have an upkeep of ${Math.ceil(cs(values, costCM, costEL)*200/6)} CS.`
 } 
 
 const ground = {
