@@ -16,11 +16,11 @@ const command = new SlashCommandBuilder().setName('missile-rate').setDescription
 generateInputs(command, inputs);
 
 const typeCosts = { //Costs are seemingly inverted
-    interceptor: {ER: 4.2, CM: 2.3, EL: 1.9, CS: 1.8},
-    ballistic: {ER: 67, CM: 8.9, EL: 5.2, CS: 6.2},
-    ip: {ER: 79, CM: 8.7, EL: 6.5, CS: 7.2},
-    gto: {ER: 67, CM: 4.5, EL: 5.4, CS: 4.2},
-	cruise: {ER: 1.5, CM: 4.5, EL: 1.3, CS: 0.6}
+    interceptor: {ER: 4.2, CM: 23, EL: 19, CS: 18},
+    ballistic: {ER: 67, CM: 89, EL: 52, CS: 62},
+    ip: {ER: 79, CM: 87, EL: 65, CS: 72},
+    gto: {ER: 67, CM: 45, EL: 54, CS: 42},
+	cruise: {ER: 1.5, CM: 45, EL: 13, CS: 06}
 }
 
 const er = (values) => {
@@ -33,20 +33,20 @@ const er = (values) => {
 
     const nuclearER = nuclear*8.6;
 
-    return Math.ceil(lengthCostER+typeCostER+nuclearER);
+    return Math.ceil((lengthCostER+typeCostER+nuclearER)/2);
 }
 
 const cm = (values) => {
     const {length, type, nuclear, systems, name} = values;
 
 
-    const lengthCostCM = length*0.38;
+    const lengthCostCM = length*3.8;
 
     const typeCostCM = typeCosts[type].CM;
 
-    const nuclearCM = nuclear*1.6;
+    const nuclearCM = nuclear*16;
 
-    return Math.ceil(lengthCostCM+typeCostCM+nuclearCM);
+    return Math.ceil((lengthCostCM+typeCostCM+nuclearCM)/2);
 }
 
 const el = (values) => {
@@ -54,24 +54,24 @@ const el = (values) => {
 
     const typeCostEL = typeCosts[type].EL;
 
-    const nuclearEL = nuclear*0.8;
+    const nuclearEL = nuclear*8;
 	
-	const systemsEL = 0.25*typeCosts[type].EL*systems;
+	const systemsEL = 2.5*typeCosts[type].EL*systems;
 	
-    return Math.ceil(typeCostEL+nuclearEL+systemsEL);
+    return Math.ceil((typeCostEL+nuclearEL+systemsEL)/2);
 }
 
 const cs = (values) => {
     const {length, type, nuclear, systems, name} = values;
 
 
-    const lengthCostCS = length*0.16;
+    const lengthCostCS = length*1.6;
 
     const typeCostCS = typeCosts[type].CS;
 
-    const nuclearCS = nuclear*0.35;
+    const nuclearCS = nuclear*3.5;
 
-    return Math.ceil(lengthCostCS+typeCostCS+nuclearCS);
+    return Math.ceil((lengthCostCS+typeCostCS+nuclearCS)/2);
 
 }
 

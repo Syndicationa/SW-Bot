@@ -15,23 +15,23 @@ const inputs = [
     {name: "light", description: "Light Armament, includes machine guns, grenade launchers up to 40mm", type: "Integer", required: false, default: 0},
     {name: "rocket", description: "Rocket Armament, unguided rockets up to 130mm caliber", type: "Integer", required: false, default: 0},
     {name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
-	{name: "name", description: "Name", type: "String", required: false, default: 'missile'},
+	{name: "name", description: "Name", type: "String", required: false, default: 'vehicle'},
 ]
 
 const command = new SlashCommandBuilder().setName('ground-rate').setDescription('Rate Ground Vehicles (no trains, sorry)');
 generateInputs(command, inputs);
 
 const armorCosts = { //Costs are seemingly inverted
-    heavy: {ER: 24, CM: 9, EL: 3, CS: 4},
-    medium: {ER: 26, CM: 5, EL: 2, CS: 3},
-    light: {ER: 40, CM: 3, EL: 1.25, CS: 2},
-    none: {ER: 100, CM: 2, EL: 1, CS: 1}
+    heavy: {ER: 24, CM: 90, EL: 30, CS: 40},
+    medium: {ER: 26, CM: 50, EL: 20, CS: 30},
+    light: {ER: 40, CM: 30, EL: 12.5, CS: 20},
+    none: {ER: 100, CM: 20, EL: 10, CS: 10}
 }
 
 const protectionCosts = { //Not inverted
-    both: {ER: 0.3, CM: 2, EL: 2.5},
-    hard: {ER: 0.15, CM: 1, EL: 1},
-    soft: {ER: 0.1, CM: 0.5, EL: 1.5},
+    both: {ER: 0.3, CM: 20, EL: 25},
+    hard: {ER: 0.15, CM: 10, EL: 10},
+    soft: {ER: 0.1, CM: 5, EL: 15},
     none: {ER: 0, CM: 0, EL: 0}
 }
 
@@ -51,55 +51,55 @@ const er = (values) => {
 
     const systemCostER = 1 + systems*0.1 + protectionCosts[protection].ER;
 
-    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER)*20) / 20;
+    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER)*100)/100;
 }
 
 const cm = (values) => {
     const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
 
-    const lengthCostCM = length**2 / 85 + armorCosts[armor].CM + protectionCosts[protection].CM;
+    const lengthCostCM = length**2 / 8.5 + armorCosts[armor].CM + protectionCosts[protection].CM;
     
-    const heavyCostCM = heavy*1;
-    const mediumCostCM = medium*0.2;
-    const lightCostCM = light*0.03;
-    const rocketCostCM = rocket*0.1;
+    const heavyCostCM = heavy*10;
+    const mediumCostCM = medium*2;
+    const lightCostCM = light*0.3;
+    const rocketCostCM = rocket;
 
-    const systemCostCM = systems*0.1 + 1;
+    const systemCostCM = systems + 1;
 
-    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM)*2) / 2;
+    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM)*20)/100;
 }
 
 const el = (values) => {
     const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
 
-    const lengthCostEL = 0.3*(length**2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
+    const lengthCostEL = 3*(length**2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
     
-    const heavyCostEL = heavy*0.6;
-    const mediumCostEL = medium*1;
-    const lightCostEL = light*0.02;
-    const rocketCostEL = rocket*0.02;
+    const heavyCostEL = heavy*6;
+    const mediumCostEL = medium*10;
+    const lightCostEL = light*0.2;
+    const rocketCostEL = rocket*0.2;
 
-    const systemCostEL = systems*0.15 + 1;
+    const systemCostEL = systems*1.5 + 1;
 
-    return Math.ceil(systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*2) / 2;
+    return Math.ceil(systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*20)/100;
 }
 
 const cs = (values, costCM, costEL) => {
     const {armor, heavy, medium, light, rocket, systems} = values;
     
     const CSCostID = 
-        (heavy > 0 || rocket > 0) ? 4 :
-        (medium > 0) ? 3 :
-        (light > 0) ? 2 : 1;
+        (heavy > 0 || rocket > 0) ? 40 :
+        (medium > 0) ? 30 :
+        (light > 0) ? 20 : 10;
     
     const lengthCostCS =
-        (CSCostID === 4 || armorCosts[armor].CS === 4) ? 5 :
-        (CSCostID === 3 || armorCosts[armor].CS === 3) ? 3 :
-        (CSCostID === 2 || armorCosts[armor].CS === 2) ? 1.5 : 1;
+        (CSCostID === 4 || armorCosts[armor].CS === 4) ? 50 :
+        (CSCostID === 3 || armorCosts[armor].CS === 3) ? 30 :
+        (CSCostID === 2 || armorCosts[armor].CS === 2) ? 15 : 10;
 
-    const systemCostCS = systems*0.25;
+    const systemCostCS = systems*2.5;
 
-    return Math.ceil((lengthCostCS + systemCostCS + 0.1*(costCM + costEL))*2)/2;
+    return Math.ceil((lengthCostCS + systemCostCS + 0.1*(costCM + costEL))*20)/100;
 }
 
 const rateFunction = (values) => {
@@ -130,7 +130,7 @@ const rateFunction = (values) => {
     const costCM = cm(values)
     const costEL = el(values)
 
-    return `The ${name} will cost about $${er(values)} million ER, ${costCM*200} CM, ${costEL*200} EL, and ${cs(values, costCM, costEL)*200} CS. It will have an upkeep of ${Math.ceil(cs(values, costCM, costEL)*200/6)} CS.`
+    return `The ${name} will cost about $${er(values)} million ER, ${costCM} CM, ${costEL} EL, and ${cs(values, costCM, costEL)} CS. It will have an upkeep of ${Math.ceil(cs(values, costCM, costEL)/6)} CS.`
 } 
 
 const ground = {

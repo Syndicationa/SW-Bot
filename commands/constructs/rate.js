@@ -65,22 +65,22 @@ const cm = (values) => {
         shield, stealth, 
         systems, engines, ftl, 
         cargo, drone, other} = values;
-    const ftlModifier = ftl === "NONE" ? 0 : (ftl === "INT" ? 6 : 4); 
-    const lCost = length*(5 + (stealth ? 2: 0) + ftlModifier);
+    const ftlModifier = ftl === "NONE" ? 0 : (ftl === "INT" ? 60 : 40); 
+    const lCost = length*(50 + (stealth ? 20: 0) + ftlModifier);
     
-    const mCost = main*10;
-    const seCost = secondary*5;
-    const lanCost = lances*30;
-    const pCost = pdc*2.5;
-    const tCost = torpedoes*2.5;
+    const mCost = main*100;
+    const seCost = secondary*50;
+    const lanCost = lances*300;
+    const pCost = pdc*25;
+    const tCost = torpedoes*25;
     
-    const sCost = shield ? 100:0;
-	const sysCost = systems * length / 10;
+    const sCost = shield ? 1000:0;
+	const sysCost = systems * length;
 
-    const cargoCost = cargo * 5;
-    const droneDiscount = drone ? 1.2:1;
+    const cargoCost = cargo * 50;
+    const droneDiscount = drone ? 12:10;
 
-    const engineCosts = {S: 5, M: 7, L: 10};
+    const engineCosts = {S: 50, M: 70, L: 100};
     const engineCost = engines.reduce((acc, [count, type]) => 
         (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);
 
@@ -94,22 +94,22 @@ const el = (values) => {
         shield, stealth, 
         systems, engines, ftl, 
         cargo, drone, other} = values;
-        const ftlModifier = ftl === "None" ? 0 : (ftl === "INT" ? 2 : 1);  
-    const lCost = length*((stealth ? 1: 0) + ftlModifier);
+        const ftlModifier = ftl === "None" ? 0 : (ftl === "INT" ? 20 : 10);  
+    const lCost = length*((stealth ? 10: 0) + ftlModifier);
     
-    const mCost = main*10;
-    const seCost = secondary*10;
-    const lanCost = lances*20;
-    const pCost = pdc*10;
-    const tCost = torpedoes*10;
+    const mCost = main*100;
+    const seCost = secondary*100;
+    const lanCost = lances*200;
+    const pCost = pdc*100;
+    const tCost = torpedoes*100;
     
-    const sCost = shield ? 100:0;
-	const sysCost = systems * length/5;
+    const sCost = shield ? 1000:0;
+	const sysCost = systems * length*2;
 
-    const cargoCost = cargo * 2;
-    const droneDiscount = drone ? 1.5:1;
+    const cargoCost = cargo * 20;
+    const droneDiscount = drone ? 15:10;
 
-    const engineCosts = {S: 5, M: 7, L: 10};
+    const engineCosts = {S: 50, M: 70, L: 100};
     const engineCost = engines.reduce((acc, [count, type]) => 
         (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);
 
@@ -122,19 +122,19 @@ const cs = (values) => {
         lances, pdc,
         systems, engines, ftl, 
         drone} = values;
-    const ftlModifier = ftl === "NONE" ? 0: 1; 
-    const lCost = length*(0.5 + ftlModifier);
+    const ftlModifier = ftl === "NONE" ? 0: 10; 
+    const lCost = length*(5 + ftlModifier);
     
-    const mCost = main*1;
-    const seCost = secondary*1;
-    const lanCost = lances*2;
-    const pCost = pdc*1;
+    const mCost = main*10;
+    const seCost = secondary*10;
+    const lanCost = lances*20;
+    const pCost = pdc*10;
 
-	const sysCost = systems * length / 5;
+	const sysCost = systems * length *2;
 
-    const droneDiscount = drone ? 0.5:1;
+    const droneDiscount = drone ? 5:10;
 
-    const engineCosts = {S: 1, M: 2, L: 3};
+    const engineCosts = {S: 10, M: 20, L: 30};
     const engineCost = engines.reduce((acc, [count, type]) => 
         (isNaN(count) || engineCosts[type] === undefined) ? acc: acc + (count*engineCosts[type]), 0);
 
@@ -183,7 +183,7 @@ const rateFunction = (values) => {
         other: correctedOther,
     }
 
-    return `The ${name} will cost about $${er(correctedValues)} billion ER, ${cm(correctedValues)*1000} CM, ${el(correctedValues)*1000} EL, and ${cs((correctedValues))*1000} CS. It will have an upkeep of ${Math.ceil(cs((correctedValues))*1000/6)} CS.`
+    return `The ${name} will cost about $${er(correctedValues)} billion ER, ${Math.ceil(cm(correctedValues))} CM, ${Math.ceil(el(correctedValues))} EL, and ${Math.ceil(cs((correctedValues)))} CS. It will have an upkeep of ${Math.ceil(cs((correctedValues))/6)} CS.`
 }
 
 const rate = {
