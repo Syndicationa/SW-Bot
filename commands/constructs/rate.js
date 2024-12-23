@@ -48,7 +48,7 @@ const er = (values) => {
     const sCost = shield ? 300:0;
 	const sysCost = systems * length;
 
-    const cargoCost = cargo * 5;
+    const cargoCost = cargo * 1;
     const droneDiscount = drone ? 0.85:1;
 
     const engineCosts = {S: 5.5, M: 7.5, L: 10.5};
@@ -77,7 +77,7 @@ const cm = (values) => {
     const sCost = shield ? 1000:0;
 	const sysCost = systems * length;
 
-    const cargoCost = cargo * 50;
+    const cargoCost = cargo * 10;
     const droneDiscount = drone ? 12:10;
 
     const engineCosts = {S: 50, M: 70, L: 100};
@@ -106,7 +106,7 @@ const el = (values) => {
     const sCost = shield ? 1000:0;
 	const sysCost = systems * length*2;
 
-    const cargoCost = cargo * 20;
+    const cargoCost = cargo * 5;
     const droneDiscount = drone ? 15:10;
 
     const engineCosts = {S: 50, M: 70, L: 100};
