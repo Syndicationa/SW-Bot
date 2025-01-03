@@ -12,7 +12,7 @@ const randInt = (lower, higher) => Math.floor((Math.random()*(higher-lower)) + l
 const inputs = [
     {name: "faction", description: "Name of the Faction", type: "String", required: true},
 	{name: "choice", description: "What you'd like to purchase", type: "String", required: true,
-		choices: [{name: "1x Pirate Immunity - 5 contraband", value: "immunity"}, {name: "1x Pirate redirection - 8 contraband", value: "redirection"}, {name: "25000 of any resource - 1 contraband", value: "resourceChoice"}]},
+		choices: [{name: "1x Pirate Immunity - 3 contraband", value: "immunity"}, {name: "1x Pirate redirection - 5 contraband", value: "redirection"}, {name: "100k of any resource - 1 contraband", value: "resourceChoice"}, {name: "Mercenary fleet for 1 week (oorp) - 5 contraband", value: "mercenaries"}]},
 	{name: "target", description: "Name of the Faction chosen (and location) or abreviated name of the resource", type: "String", required: false},
 ]
 
@@ -54,10 +54,13 @@ const runbMarket = async (interaction) => {
 				output = `The pirates have been bribed and directed to ${target}, they'll attack soon...`;
 				break;
 			case "resourceChoice":
-				output = `${faction} traded 1 contraband for 2000 ${target} at the black market, well, for most of it at least.`;
-				nVal = resources[target] + randInt(20000, 25000);
+				output = `${faction} traded 1 contraband for 100k ${target} at the black market, well, for most of it at least.`;
+				nVal = resources[target] + randInt(95000, 100000);
 				newResources[target] = nVal;
 				setFaction(server, faction, {Resources: {...resources, ...newResources}});
+				break;
+			case "mercenaries":
+				output = `Alright, alright ${faction}, we have a deal. The command of a belt fleet is yours for that long.`;
 				break;
 		
 		}
