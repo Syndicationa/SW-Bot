@@ -78,7 +78,7 @@ const cm = (values) => {
 	const sysCost = systems * length;
 
     const cargoCost = cargo * 10;
-    const droneDiscount = drone ? 12:10;
+    const droneDiscount = drone ? 1.2:1;
 
     const engineCosts = {S: 50, M: 70, L: 100};
     const engineCost = engines.reduce((acc, [count, type]) => 
@@ -107,7 +107,7 @@ const el = (values) => {
 	const sysCost = systems * length*2;
 
     const cargoCost = cargo * 5;
-    const droneDiscount = drone ? 15:10;
+    const droneDiscount = drone ? 1.5:1;
 
     const engineCosts = {S: 50, M: 70, L: 100};
     const engineCost = engines.reduce((acc, [count, type]) => 
@@ -132,7 +132,7 @@ const cs = (values) => {
 
 	const sysCost = systems * length *2;
 
-    const droneDiscount = drone ? 5:10;
+    const droneDiscount = drone ? 0.5:1;
 
     const engineCosts = {S: 10, M: 20, L: 30};
     const engineCost = engines.reduce((acc, [count, type]) => 

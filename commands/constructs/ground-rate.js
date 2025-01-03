@@ -88,9 +88,9 @@ const cs = (values, costCM, costEL) => {
     const {armor, heavy, medium, light, rocket, systems} = values;
     
     const CSCostID = 
-        (heavy > 0 || rocket > 0) ? 40 :
-        (medium > 0) ? 30 :
-        (light > 0) ? 20 : 10;
+        (heavy > 0 || rocket > 0) ? 4 :
+        (medium > 0) ? 3 :
+        (light > 0) ? 2 : 1;
     
     const lengthCostCS =
         (CSCostID === 4 || armorCosts[armor].CS === 4) ? 50 :
