@@ -41,7 +41,7 @@ const calculateInfluence = (res, usages, maps) => {
 }
 
 const calculatePopulation = (res) => {
-    const consumableInfluence = res.CS * 50000/ res.Population;
+    const consumableInfluence = res.CS * 5000/ res.Population;
     const populationGrowth = 
        consumableInfluence <= 0.5 ? -5
        : consumableInfluence <= 1 ? (consumableInfluence - 1)*1
