@@ -130,7 +130,7 @@ const rateFunction = (values) => {
     const costCM = cm(values)
     const costEL = el(values)
 
-    return `The ${name} will cost about $${er(values)} million ER, ${costCM} CM, ${costEL} EL, and ${cs(values, costCM, costEL)} CS. It will have an upkeep of ${Math.ceil(cs(values, costCM, costEL)/6)} CS.`
+    return `The ${name} will cost about $${er(values)} million ER, ${Math.ceil(costCM)} CM, ${Math.ceil(costEL)} EL, and ${Math.ceil(cs(values, costCM, costEL))} CS. It will have an upkeep of ${Math.ceil(cs(values, costCM, costEL)/6)} CS.`
 } 
 
 const ground = {
