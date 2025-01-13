@@ -2,9 +2,9 @@ const city = {
     name:"City",
     date:{_seconds:1718496000,_nanoseconds:0},
     cost:{
-        CM: 500, "U-CM": 0,
-        CS: 500, "U-CS":0,
-        EL: 250, "U-EL":0,
+        CM: 5000, "U-CM": 0,
+        CS: 5000, "U-CS":0,
+        EL: 2500, "U-EL":0,
         Population: 0, Military: 0,
         ER: 1000000000, Influence: 0,
     },
@@ -27,9 +27,9 @@ const producers = (res, type) => {
         name: `${res} ${type}`,
         date:{_seconds:1718496000,_nanoseconds:0},
         cost:{
-            CM: 2000, "U-CM": 0,
+            CM: 20000, "U-CM": 0,
             CS: 0, "U-CS":0,
-            EL: 1000, "U-EL":0,
+            EL: 10000, "U-EL":0,
             Population: 0, Military: 0,
             ER: 1000000000, Influence: 0,
         },
@@ -44,7 +44,7 @@ const producers = (res, type) => {
             CS: 0, "U-CS": 0,
             EL: 0, "U-EL": 0,
             Production: 0,
-            [res]: type === "Extractor" ? 1000 : 2000
+            [res]: type === "Extractor" ? 10000 : 20000
         }
     };
 };
@@ -54,9 +54,9 @@ const storage = (res) => {
         name: `${res} Storage`,
         date:{_seconds:1718496000,_nanoseconds:0},
         cost:{
-            CM: 2000, "U-CM": 0,
+            CM: 20000, "U-CM": 0,
             CS: 0, "U-CS":0,
-            EL: 1000, "U-EL":0,
+            EL: 10000, "U-EL":0,
             Population: 0, Military: 0,
             ER: 1000000000, Influence: 0,
         },
@@ -65,7 +65,7 @@ const storage = (res) => {
             CS: 0, "U-CS": 0,
             EL: 0, "U-EL": 0,
             Population: 0,
-            [res]: 10000
+            [res]: 100000
             },
         capacity:{
             CM: 0, "U-CM": 0,
@@ -83,9 +83,9 @@ const yard = {
     name:"Factory",
     date:{_seconds:1718496000,_nanoseconds:0},
     cost:{
-        CM: 2000, "U-CM": 0,
+        CM: 20000, "U-CM": 0,
         CS: 0, "U-CS":0,
-        EL: 1000, "U-EL":0,
+        EL: 10000, "U-EL":0,
         Population: 0, Military: 0,
         ER: 1000000000, Influence: 0,
     },

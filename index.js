@@ -9,7 +9,14 @@ const { collectIncome } = require('./functions/income');
 const useLogs = false;
 console.clear()
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const intents = [
+	GatewayIntentBits.Guilds, 
+	GatewayIntentBits.GuildMessages, 
+	// GatewayIntentBits.GuildMembers,
+	// GatewayIntentBits.MessageContent,
+];
+
+const client = new Client({ intents });
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');

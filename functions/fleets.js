@@ -8,62 +8,121 @@ const exampleVehicle = {
     count: 0
 }
 
-const calculateValue = (vehicles, fleet) => {
-    const orderedVehicles = []
-    vehicles.forEach((vehicle) => orderedVehicles[vehicle.ID] = vehicle);
-
-    const cost = fleet.Vehicles.reduce((acc, {Count, ID}) => {
-        return addResources(scaleResources(orderedVehicles[ID].cost, Count), acc)
-    }, {});
-
-    return cost;
-}
-
-const valueFleet = (vehicles, fleet, reservedCostModifier) => {
-    const cost = calculateValue(vehicles, fleet);
-
-    return {
-        ...fleet,
-        Value: cost,
-        CSCost: cost.CS * (fleet.State.Action === "Reserved") ? reservedCostModifier:1,
-    }
-}
-
 const states = [
     {Action: "Move", Source: "Place", Destination: "Place2", Start: new Date(), End: new Date()},
     {Action: "Defense", Location: "Earth"},
-    {Action: "Battle", Location: "Earth", Enemies: [["Faction Name", `Fleet ID Number`]]},
+    {Action: "Battle", Location: "Earth", Battle: 0},
     {Action: "Activating", Location: "Earth", Activation: new Date()},
     {Action: "Mothballed", Location: "Earth", Start: new Date()}
 ];
 
-const exampleFleet = {
+const exampleGroup = {
     ID: 0,
-    Vehicles: [{Count: 0, ID: 1}],
+    Vehicles: [{Faction: "name", Count: 0, ID: 1}],
     State: states[0],
     Value: {},
     CSCost: 0
 };
 
-const makeAFleet = (ID, vehicles, location) => {
+const getFactions = (group) => {
+    return Array.from(new Set(group.Vehicles.map(vehicle => vehicle.faction)));
+}
+
+const calculateValue = (vehicles = new Map(), group) => {
+    const cost = group.Vehicles.reduce((acc, {Count, Faction, ID}) => {
+        return addResources(scaleResources(vehicles.get([Faction, ID]).Cost, Count), acc)
+    }, {});
+
+    return cost;
+}
+
+const valueGroup = (vehicles, group) => {
+    const cost = calculateValue(vehicles, group);
+
+    return {
+        ...group,
+        Value: cost,
+        CSCost: Math.ceil(cost.CS * (group.State.Action === "Mothballed") ? 0.05:0.2),
+    }
+}
+
+const makeAGroup = (ID, location) => {
     return {
         ID,
-        Vehicles: vehicles,
-        Location: {Action: "Defense", Location: location, Value: -1},
+        Vehicles: [],
+        State: {Action: "Defense", Location: location},
+        Value: -1,
         CSCost: -1
     }
 }
 
-const joinATrade = (trade, member, priority) => {
-    if (trade[member] === undefined) return false;
-    if (!isNaN(trade[member].Priority)) return false;
-    return {
-        ...trade,
-        [member]: {
-            ...trade[member],
-            Priority: priority
-        }
-    };
+const validDistance = (sourceLocation, targetLocation) => {
+    if (sourceLocation === targetLocation) return true;
+    //Add more here
+    return false;
+}
+
+const validTransfer = (source, target) => {
+    switch(source.State.Action) {
+        case "Move":
+            return false;
+        case "Defense":
+        case "Activating":
+        case "Mothballed":
+            return (
+                (target.State.Action === "Defense"
+                || target.State.Action === "Mothballed"
+                || target.State.Action === "Activating")
+                && validDistance(source.State.Location, target.State.Location)
+            )
+        case "Battle":
+            return source.State.Battle === target.State.Battle
+    }
+};
+
+const addVehicleToMap = (map = new Map()) => (vehicle) => {
+    map.set([vehicle.Faction, vehicle.ID], vehicle.Count)
+}
+
+const createVehicleArray = (map = new Map()) => {
+    let arr = [];
+    for (const [[Faction, ID], Count] of map) {
+        arr.push({Faction, ID, Count});
+    }
+    return arr;
+}
+
+const addVehicles = (target, vehicles) => {;
+    const targetMap = new Map();
+    const transferMap = new Map();
+
+    target.forEach(addVehicleToMap(targetMap));
+    vehicles.forEach(addVehicleToMap(transferMap));
+    
+    for (const [key, count] of transferMap) {
+        targetMap.set(key, count + (target.get(key) ?? 0));
+    }
+
+    return {...target, Vehicles: createVehicleArray(targetMap)};
+}
+
+const transferVehicles = (source, target, vehicles) => {
+    if (!validTransfer(source, target)) throw Error("Distance or States invalid");
+    const sourceMap = new Map();
+    const targetMap = new Map();
+    const transferMap = new Map();
+
+    source.forEach(addVehicleToMap(sourceMap));
+    target.forEach(addVehicleToMap(targetMap));
+    vehicles.forEach(addVehicleToMap(transferMap));
+    
+    for (const [key, count] of transferMap) {
+        if (!sourceMap.has(key)) throw Error("Vehicle to tranfer is missing");
+        sourceMap.set(key, count + source.get(key));
+        targetMap.set(key, count + (target.get(key) ?? 0));
+    }
+
+    return [{...source, Vehicles: createVehicleArray(sourceMap)}, {...target, Vehicles: createVehicleArray(targetMap)}];
 }
 
 const generateNextID = (list) => {
@@ -74,6 +133,6 @@ const generateNextID = (list) => {
     return sorted.length;
 }
 
-const findTrade = (list = [exampleTrade], ID) => list.find(trade => trade.ID === ID);
+const findGroup = (list = [exampleGroup], ID) => list.find(group => group.ID === ID);
 
-module.exports = {valueFleet, generateNextID, findTrade, joinATrade}
+module.exports = {states, getFactions, valueGroup, makeAGroup, addVehicles, transferVehicles, generateNextID, findGroup};

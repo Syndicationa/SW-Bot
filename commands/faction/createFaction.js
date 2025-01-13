@@ -18,7 +18,7 @@ const createEmptyData = (resources) => resources.reduce((acc, v) => {return {...
 const runCreate = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
     const {faction} = arguments;
-    const treasury = arguments.treasury ?? "281b 413k CM 207k EL 369k CS 40m Population";
+    const treasury = arguments.treasury ?? "2560b 1460k CM 780k EL 1020k CS 40m Population";
 
     let error = '';
     const server = interaction.guild.name;
@@ -53,18 +53,22 @@ const runCreate = async (interaction) => {
     }
     const genericMaps = settings.PlaceList.reduce((acc, v) => {return {...acc, [v]: genericPlanet}},{});
 
-    const today = new Date();
-
     createFaction(server, faction, {
-        Resources: resources, 
+        Resources: resources,
+        Capacities: createEmptyData(settings.Capacities),
+        Usages: createEmptyData(settings.Capacities),
         Storage: createEmptyData(settings.Storage),
-        Capacicies: createEmptyData(settings.Capacicies),
-        Usages: createEmptyData(settings.Capacicies),
-        Maps: genericMaps,
-        Vehicles: [],
         Buildings: buildings,
+        Maps: genericMaps,
+
+        Wars: [],
+        Trades: [],
+        Missions: [],
+        Outgoing: [],
+        Vehicles: [],
         Fleets: [],
-        Missions: []
+        Incoming: [],
+        Pacts: [],
     });
     await interaction.reply(`${faction} has been created`);
 }

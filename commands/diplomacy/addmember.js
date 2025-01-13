@@ -62,14 +62,14 @@ const runAddMember = async (interaction) => {
             `${faction} cannot join ${newPact.Name}`
         );
     } else if (success) {
-        embed = await addingMember(server, faction, factionData, newPact, Active);
+        embed = await addingMember(server, faction, factionData, newPact, {Active, Pending});
     } else {
-        embed = newRequest(server, faction, factionData, newPact);
+        embed = newRequest(server, faction, factionData, newPact, {Active, Pending});
     }
     await interaction.reply({ embeds: [ embed ]});
 }
 
-const newRequest = (server, faction, factionData, pact) => {
+const newRequest = (server, faction, factionData, pact, {Active, Pending}) => {
     if (pact.Participants.length >= 2)
         setFaction(server, "data", {Pacts: {Pending, Active: [...Active, pact]}});
     else
@@ -81,7 +81,7 @@ const newRequest = (server, faction, factionData, pact) => {
     );
 }
 
-const addingMember = async (server, faction, factionData, pact, activePacts) => {
+const addingMember = async (server, faction, factionData, pact, {Active: activePacts, Pending}) => {
     const factions = await Promise.all([...pact.Participants.map(async (name) => {
         const factionData = await getFaction(server,name);
         return [name, factionData]

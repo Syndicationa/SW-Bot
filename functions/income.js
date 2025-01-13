@@ -36,7 +36,7 @@ const income = async (server) => {
     
     console.log(incomePeriods);
     if (incomePeriods < 1) return;
-    if (incomePeriods > 1) throw Error(`Please check ${server} in the database`);
+    // if (incomePeriods > 1) throw Error(`Please check ${server} in the database`);
 
     const newFactionData = performIncome(factionData);
     const newTimestamp = Timestamp.fromDate(newDate);

@@ -20,7 +20,7 @@ const typeCosts = { //Costs are seemingly inverted
     ballistic: {ER: 67, CM: 89, EL: 52, CS: 62},
     ip: {ER: 79, CM: 87, EL: 65, CS: 72},
     gto: {ER: 67, CM: 45, EL: 54, CS: 42},
-	cruise: {ER: 1.5, CM: 45, EL: 13, CS: 06}
+	cruise: {ER: 1.5, CM: 45, EL: 13, CS: 6}
 }
 
 const er = (values) => {
