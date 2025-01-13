@@ -69,10 +69,10 @@ const retrieveFunction = (input = exampleInputs) => {
     }
 }
 
-const retrieveInputs = (option, inputArray = exampleInputs) => {
+const retrieveInputs = (options, inputArray = exampleInputs) => {
     let output = {};
     inputArray.forEach((input) => {
-        const data = retrieveFunction(input)(option, input.name);
+        const data = retrieveFunction(input)(options, input.name);
         if (data !== null) output = {...output, [input.name]: data};
     })
     return output;

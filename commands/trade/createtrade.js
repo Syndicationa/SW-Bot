@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
+const {generateInputs, retrieveInputs} = require('../../functions/discord/optionHandler');
 const { splitCurrency, handleReturnMultiple, convertToObject } = require('../../functions/currency');
 const { db } = require('../../firebase');
 const { getFaction, setFaction } = require('../../functions/database');

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { getFactionNames, getFaction } = require('../../functions/database');
 const { log } = require('../../functions/log');
-const { generateInputs, retrieveInputs } = require('../../functions/createInputs');
+const { generateInputs, retrieveInputs } = require('../../functions/discord/optionHandler');
 const { objectReduce } = require('../../functions/functions');
 
 const inputs = [

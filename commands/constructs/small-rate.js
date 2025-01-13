@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
+const {generateInputs, retrieveInputs} = require('../../functions/discord/optionHandler');
 
 const inputs = [
     {name: "length", description: "Length of the craft", type: "Number", required: true},

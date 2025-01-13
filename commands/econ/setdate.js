@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {generateInputs, retrieveInputs} = require('../../functions/createInputs');
+const {generateInputs, retrieveInputs} = require('../../functions/discord/optionHandler');
 const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { db } = require('../../firebase');
