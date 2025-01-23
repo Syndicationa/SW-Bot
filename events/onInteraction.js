@@ -1,5 +1,7 @@
 const { Events, MessageFlags } = require('discord.js');
 
+const lagMode = true;
+
 const onInteraction = async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -8,6 +10,11 @@ const onInteraction = async (interaction) => {
 		if (!command) {
 			console.error(`No command matching ${interaction.commandName} was found.`);
 			return;
+		}
+
+		if (lagMode) {
+			await interaction.deferReply();
+			interaction.reply = interaction.editReply;
 		}
 
 		try {

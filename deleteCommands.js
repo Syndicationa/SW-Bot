@@ -30,15 +30,20 @@ const rest = new REST().setToken(token);
 // and deploy your commands!
 (async () => {
 	try {
-		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+		console.log(`Started deleting ${commands.length} application (/) commands.`);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await rest.put(
-			Routes.applicationCommands(clientId),
-			{ body: commands },
+		await rest.put(
+			Routes.applicationGuildCommands(clientId, guildId),
+			{ body: [] },
 		);
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		await rest.put(
+			Routes.applicationCommands(clientId, guildId),
+			{ body: [] },
+		);
+
+		console.log(`Successfully deleted the application (/) commands.`);
 	} catch (error) {
 		// And of course, make sure you catch and log any errors!
 		console.error(error);

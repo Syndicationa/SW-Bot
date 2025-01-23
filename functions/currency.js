@@ -50,8 +50,6 @@ const resourceArrayToObject = (arr) =>
 const handleReturnMultiple = (obj, order = undefined, join = "\n") => { 
     if (Array.isArray(obj)) 
         return handleReturnMultiple(resourceArrayToObject(obj));
-
-    console.log(obj);
     
     let source = order ?? Object.keys(obj).sort();
     
@@ -79,4 +77,4 @@ const convertToObject = (resources, costList) => costList.reduce(
 
 //console.log(splitCurrency("20b EM; 320m PM + 20 NM"));
 
-module.exports = {splitCurrency, handleCurrency, handleReturnMultiple, handleReturn, defaultResources, convertToObject};
+module.exports = {splitCurrency, handleCurrency, resourceArrayToObject, handleReturnMultiple, handleReturn, defaultResources, convertToObject};

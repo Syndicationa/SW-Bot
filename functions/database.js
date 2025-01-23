@@ -1,3 +1,4 @@
+const fs = require('node:fs');
 const { db } = require('../firebase');
 const { minResources, maxResources, addResources, subResources, validResources} = require('./resourceMath');
 const { calculateIncome } = require('./incomeMath');
@@ -98,15 +99,15 @@ const deletePlace = (server, place) => {
 
 module.exports = {getFaction, getServers, getFactionNames, getFactions, setDatabase, setFaction, printDatabase, createFaction, claimPlace, deleteFaction, deletePlace};
 
-const fs = require('node:fs');
 const FirebaseFirestore = require("@google-cloud/firestore");
 const { defaultResources, splitCurrency, convertToObject } = require('./currency');
 const buildings = require("../buildings");
 const { Timestamp } = require('firebase-admin/firestore');
 const { getFactionStats } = require('./income');
+const { scaleResources } = require("./resourceMath");
 const { split } = require('./functions');
 
-const file = "./database/database26.txt"
+const file = "./database/database36.txt"
 
 const run = async () => {
     await setDatabase();
@@ -147,9 +148,10 @@ const saveToDatabase = async () => {
 
     // console.log(resourceObject);
 
-    for (server in database) {
-        for (faction in database[server]) {
+    for (const server in database) {
+        for (const faction in database[server]) {
             const data = database[server][faction]
+
             if (faction === "settings") {
                 // for (const each in data.Places) {
                 //     console.log(each);
@@ -186,12 +188,22 @@ const saveToDatabase = async () => {
 
             // const factionInfo = {...data};
             
-            const {Capacities, Storage} = getFactionStats(database[server].settings, data);
+            // const {Resources, Capacities, Storage} = getFactionStats(database[server].settings, data);
 
-            // const CapacitiesP = addResources(data.Capacities, {Influence: 0});
-            // console.log(CapacitiesP);
+            // const ResourcesP = scaleResources(Resources, 10);
+            // const ResourcesP = {
+            //     ...Resources,
+            //     CM: Resources.CM*10,
+            //     CS: Resources.CS*10,
+            //     EL: Resources.EL*10,
+            //     "U-CM": Resources["U-CM"]*10,
+            //     "U-CS": Resources["U-CS"]*10,
+            //     "U-EL": Resources["U-EL"]*10,
+            // }
+            // const CapacitiesP = scaleResources(Capacities, 10);
+            // const StorageP = scaleResources(Storage, 10);
 
-            createFaction(server, faction, {...data, Buildings, Capacities, Storage});
+            createFaction(server, faction, {...data});
             console.log(`Fixing ${faction}`);
         }
     }
