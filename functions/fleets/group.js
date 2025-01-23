@@ -1,12 +1,4 @@
-const { addResources, scaleResources } = require("./resourceMath");
-
-const exampleVehicle = {
-    ID: 0,
-    date: new Date(), 
-    name: "NAME", 
-    cost: {}, 
-    count: 0
-}
+const { addResources, scaleResources } = require("../resourceMath");
 
 const states = [
     {Action: "Move", Source: "Place", Destination: "Place2", Start: new Date(), End: new Date()},
@@ -17,8 +9,10 @@ const states = [
 ];
 
 const exampleGroup = {
+    Name: "Example",
     ID: 0,
-    Vehicles: [{Faction: "name", Count: 0, ID: 1}],
+    Type: "Space",
+    Vehicles: [{faction: "name", count: 0, id: 1}],
     State: states[0],
     Value: {},
     CSCost: 0
@@ -46,13 +40,15 @@ const valueGroup = (vehicles, group) => {
     }
 }
 
-const makeAGroup = (ID, location) => {
+const makeAGroup = (name, ID, type, location) => {
     return {
+        Name: name,
         ID,
+        Type: type,
         Vehicles: [],
         State: {Action: "Defense", Location: location},
-        Value: -1,
-        CSCost: -1
+        Value: null,
+        CSCost: 0
     }
 }
 
@@ -81,13 +77,15 @@ const validTransfer = (source, target) => {
 };
 
 const addVehicleToMap = (map = new Map()) => (vehicle) => {
-    map.set([vehicle.Faction, vehicle.ID], vehicle.Count)
+    map.set(`${vehicle.Faction}<>${vehicle.ID}`, vehicle.Count)
 }
 
 const createVehicleArray = (map = new Map()) => {
     let arr = [];
-    for (const [[Faction, ID], Count] of map) {
-        arr.push({Faction, ID, Count});
+    for (const [data, count] of map) {
+        const [faction, numberStr] = data.split("<>");
+        const id = Number(numberStr);
+        arr.push({faction, id, count});
     }
     return arr;
 }
@@ -126,7 +124,7 @@ const transferVehicles = (source, target, vehicles) => {
 }
 
 const generateNextID = (list) => {
-    const sorted = list.sort((a, b) => a.ID - b.ID);
+    const sorted = list.toSorted((a, b) => a.ID - b.ID);
     
     for (let i = 0; i < sorted.length; i++)
         if (i < sorted[i].ID) return i;
