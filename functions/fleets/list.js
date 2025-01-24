@@ -1,142 +1,8 @@
 const { getFaction, getFactions } = require("../database");
+const { listFleets, formatRowWithIndicator } = require("./list/printFleetData");
 const pageController = require("../pageButtons");
 const { generateRow } = require('../discord/actionHandler');
-
-const inputs = [
-    {name: "faction", description: "Faction", type: "String", required: true}
-];
-
-const singleFleet = (fleet) => {
-    const {Name, Vehicles, State, CSCost} = fleet;
-
-    const vehicleCount = Vehicles.reduce((count, vehicle) => count + vehicle.count,0);
-
-    let stateStr;
-    switch (State.Action) {
-        case "Move":
-            stateStr = `Target: ${State.Destination} Arrival at ${State.end}`;
-            break;
-
-        case "Defense":
-        case "Battle":
-            stateStr = `Location: ${State.Location}`;
-            break;
-
-        case "Activating":
-            stateStr = `Location: ${State.Location} Active at ${State.Activation}`;
-            break;
-
-        case "Mothballed":
-            stateStr = `Location: ${State.Location} Mothballed since ${State.Start}`;
-            break;
-
-        default:
-            throw 'Errorenous vehicle state';
-    }
-
-    return Name.slice(0,12).padEnd(14) + State.Action.padEnd(12) + stateStr;
-}
-
-const singleVehicle = (vehicle, factionDatas) => {
-    const {faction, count, id} = vehicle;
-
-    const name = factionDatas[faction].Vehicles[id].name;
-
-    return `${name.slice(0,12).padEnd(14)}|${("" + count).slice(0,8).padStart(10)}${faction}`
-}
-
-const listFleets = (fleets) => {
-    const tableMessage = `Fleets         State       Information`;
-    const tableLine = "-".repeat(tableMessage.length);
-    const fleetStrs = fleets.map(singleFleet);
-
-    const pages = [[]];
-    let charCount = 0;
-
-    let page = pages[0];
-
-    const intro = [tableMessage, tableLine].join("\n");
-    charCount = intro.length;
-
-    for (const str of fleetStrs) {
-        charCount += str.length + 2; //Adds select character and new line
-
-        if (charCount > 1994) {//2000 character limit - 6 for the block statement
-            pages.push([]);
-            page = pages[pages.length - 1];
-            charCount = intro.length + str.length + 2;
-        }
-
-        page.push(str);
-    }
-
-    return [intro, pages];
-}
-
-const listVehicles = (fleet, factionDatas) => {
-    const {Name, State, CSCost, Vehicles} = fleet;
-
-    let status = "Status: ";
-    switch (State.Action) {
-        case "Move":
-            status += `Moving to ${State.Destination} arrival at ${State.end}`;
-            break;
-
-        case "Defense":
-            status += `Defending ${State.Location}`
-            break;
-        case "Battle":
-            status += `Fighting battle around ${State.Location}`;
-            break;
-
-        case "Activating":
-            stateStr = `Activating around ${State.Location}. Ready at ${State.Activation}`;
-            break;
-
-        case "Mothballed":
-            stateStr = `Mothballed around ${State.Location}. Mothballed since ${State.Start}`;
-            break;
-
-        default:
-            throw 'Errorenous vehicle state';
-    }
-
-    const consuming = `Consuming ${CSCost} CS`
-    const tableMessage = `Class          Count      Faction`;
-    const tableLine = "-".repeat(tableMessage.length);
-    const fleetStrs = Vehicles.map((v) => singleVehicle(v, factionDatas));
-
-    const pages = [[]];
-    let charCount = 0;
-    
-    let page = pages[0];
-
-    const intro = [Name + " ", status, consuming, tableMessage, tableLine].join("\n");
-    charCount = intro.length;
-
-    for (const str of fleetStrs) {
-        charCount += str.length + 1; //Adds one for the new line
-
-        if (charCount > 1994) {//2000 character limit - 6 for the block statement
-            pages.push([]);
-            page = pages[pages.length - 1];
-            charCount = intro.length + str.length + 1;
-        }
-
-        page.push(str);
-    }
-
-    return [intro, pages];
-};
-
-const formatRowWithIndicator = (pageRows, index) => {
-    const output = [];
-    for (let i = 0; i < pageRows.length; i++) {
-        output[i] = (i === index ? ">":" ") + pageRows[i];
-    };
-
-    return output.join("\n");
-}
+const defaultListing = require("./list/normalList");
 
 const fleetListButtons = (up, down, select) => [
     {
@@ -168,18 +34,6 @@ const fleetListButtons = (up, down, select) => [
     },
 ];
 
-const singleListButtons = (back) => [
-    {
-        action: "button",
-        label: "Back",
-        id: "back",
-        style: "Secondary",
-        disabled: false,
-
-        function: back
-    },
-]
-
 const updatePage = (listState, print) => (interaction, pageNumber, buttons) => {
     listState.page = pageNumber;
     listState.pageButtons = buttons;
@@ -195,13 +49,12 @@ const moveSelector = (listState, dir, print) => (interaction) => {
 }
 
 const select = (listState, print) => (interaction) => {
-    const {page, offsets, selectedOnPage, fleetData, factionDatas} = listState;
+    const {page, offsets, selectedOnPage} = listState;
 
     listState.state = "Single";
     listState.fleetPage = page;
     listState.selectedFleet = offsets[page] + selectedOnPage;
-    [listState.vehicleIntro, listState.vehiclePages] = listVehicles(fleetData[listState.selectedFleet], factionDatas);
-    listState.pageButtons = pageController(listState.vehiclePages.length, updatePage(listState, print));
+    listState.setup(listState);
 
     interaction.update(print())
 }
@@ -216,12 +69,12 @@ const cancel = (listState, print) => (interaction) => {
     interaction.update(print())
 }
 
-const print = (listState) => () => {
+const print = (listState) => (generateRows = true) => {
     const {state, page, selectedOnPage,
         fleetsIntro, fleetsPages,
-        vehicleIntro, vehiclePages,
+        singlePrint,
         
-        fleetButtons, singleButtons,
+        fleetButtons,
         pageButtons,
     } = listState;
     
@@ -234,8 +87,9 @@ const print = (listState) => () => {
             components = [fleetButtons, pageButtons];
             break;
         case "Single":
-            str += vehicleIntro + "\n" + vehiclePages[page].join("\n");
-            components = [singleButtons, pageButtons];
+            let subStr;
+            [subStr, components] = listState.singlePrint(listState);
+            str += subStr;
             break;
         default: 
             throw "Broken";
@@ -243,7 +97,7 @@ const print = (listState) => () => {
 
     str += "```"
 
-    components = components.map((list) => generateRow(list));
+    if (generateRows) components = components.map((list) => generateRow(list));
 
     return {
         content: str,
@@ -251,7 +105,8 @@ const print = (listState) => () => {
     };
 }
 
-const list = async (server, {faction}) => {
+const list = async (server, inputs, listingSystem = defaultListing) => {
+    const {faction} = inputs; 
     const factionData = await getFaction(server, faction);
     if (factionData === undefined) {
         error = 'Faction not found';
@@ -271,6 +126,8 @@ const list = async (server, {faction}) => {
 
     const listState = {
         state: "All",
+        faction,
+
         fleetsIntro: intro,
         fleetsPages: fleets,
         fleetData: factionData.Fleets,
@@ -283,14 +140,18 @@ const list = async (server, {faction}) => {
         offsets,
 
         selectedFleet: -1,
-        vehicleIntro: null,
-        vehiclePages: null,
+
+        single: null,
+        setup: listingSystem.setup,
+        singlePrint: listingSystem.print,
 
         fleetButtons: null,
         singleButtons: null,
 
         pageButtons: null
     };
+
+    listingSystem.handleOtherInputs(listState, inputs, factionData);
 
     const localPrint = print(listState);
 
@@ -302,11 +163,11 @@ const list = async (server, {faction}) => {
     const back = cancel(listState, localPrint);
 
     listState.fleetButtons = fleetListButtons(up, down, pick);
-    listState.singleButtons = singleListButtons(back);
+    listState.singleButtons = listingSystem.buttons(back, listState, localPrint);
 
-    const out = localPrint();
+    const out = localPrint(false);
 
-    return [out.content, [listState.fleetButtons, listState.pageButtons], [listState.fleetButtons, listState.pageButtons, listState.singleButtons]]
+    return [out.content, out.components, [listState.fleetButtons, listState.pageButtons, listState.singleButtons]]
 }
 
-module.exports = {inputs, list};
+module.exports = {list};

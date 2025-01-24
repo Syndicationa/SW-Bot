@@ -1,7 +1,9 @@
 const { componentCollector, generateRow } = require("../../functions/discord/actionHandler");
 const commandBuilder = require("../../functions/discord/commandBuilder");
 const { inputs: createInputs, createFleet } = require("../../functions/fleets/create");
-const { inputs: listInputs, list } = require("../../functions/fleets/list");
+const { list } = require("../../functions/fleets/list");
+const { inputs: listInputs } = require("../../functions/fleets/list/normalList");
+const { inputs: renameInputs, ...rename } = require("../../functions/fleets/list/rename");
 
 const name = "fleet";
 const description = "For testing a new style of rating";
@@ -18,6 +20,12 @@ const inputs = [
         description: "List fleets",
         type: "Subcommand",
         options: listInputs,
+    },
+    {
+        name: "rename",
+        description: "Rename a fleet",
+        type: "Subcommand",
+        options: renameInputs,
     },
 ]
 
@@ -36,6 +44,9 @@ const fleets = async (interaction, inputs) => {
         case "list":
             [resultStr, components, allComponents] = await list(server, inputs);
             break;
+        case "rename":
+            [resultStr, components, allComponents] = await list(server, inputs, rename);
+            break;
         default:
             resultStr = "Not accepted Input"
     }
@@ -50,7 +61,7 @@ const fleets = async (interaction, inputs) => {
     const basicFilter = (i) => i.user.id === interaction.user.id
 
     const shutdown = async (_, reason) => {
-        console.log(reason);
+        if (reason === 'user') return;
         await interaction.editReply({content: `Process done`, components: []});
     }
 
