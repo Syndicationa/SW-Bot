@@ -17,11 +17,10 @@ const inputs = [
     {name: "fleet-id", description: "Fleet ID", type: "String", required: false},
 ]
 
-const updateListState = (id, vehicles, name, resources) => (listState) => {
+const updateListState = (id, vehicles, name) => (listState) => {
     const fleets = listState.fleetData;
     listState.vehicles = vehicles;
     listState.name = name;
-    listState.resources = resources;
     listState.allSingleButtons = [];
     
     if (id === undefined) return;
@@ -41,7 +40,7 @@ const updateListState = (id, vehicles, name, resources) => (listState) => {
 
 const add = (listState) => (interaction, collector) => {
     const server = interaction.guild.name;
-    const {faction, factionDatas, fleetData: fleets, selectedFleet, vehicles, name, resources} = listState;
+    const {faction, factionDatas, fleetData: fleets, selectedFleet, vehicles, name} = listState;
 
     const fleet = fleets[selectedFleet];
     addVehicles(fleet, [vehicles]);
@@ -59,7 +58,7 @@ const add = (listState) => (interaction, collector) => {
 
     valueGroup(vehicleDataMap, fleet)
     
-    setFaction(server, faction, {Fleets: fleets, Resources: resources}); //To be honest this is evil
+    setFaction(server, faction, {Fleets: fleets}); //To be honest this is evil
     
     collector.stop();
     
@@ -152,18 +151,6 @@ const runBuy = async (interaction) => {
         return;
     }
 
-    const resources = factionData.Resources;
-
-    const newResources = roundResources(subResources(resources, costs));
-    const newRes0 = maxResources(newResources);
-
-    if (!equResources(newResources, newRes0)) {
-        error = 'Not enough funds';
-        buyLog({arguments, error});
-        await interaction.reply(error);
-        return;
-    }
-
     const vehicleData = {
         faction: (owner || faction).toLowerCase(),
         ID: vehicle.ID,
@@ -171,7 +158,7 @@ const runBuy = async (interaction) => {
     };
 
     const listing = {
-        handleOtherInputs: updateListState(fleet, vehicleData, vehicle.name, {...resources, ...newResources}),
+        handleOtherInputs: updateListState(fleet, vehicleData, vehicle.name),
         buttons: buyButtons,
         setup: () => {},
         print: singleFleetPrint
@@ -196,7 +183,7 @@ const runBuy = async (interaction) => {
     componentCollector(allComponents.flat(), 720_000, shutdown, basicFilter)(result);
 }
 
-const command = new SlashCommandBuilder().setName('buy-vehicle').setDescription('Buy Vehicle');
+const command = new SlashCommandBuilder().setName('buy-free').setDescription('Get Vehicles');
 generateInputs(command, inputs);
 
 const buy = {
