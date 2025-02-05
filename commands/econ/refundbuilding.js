@@ -56,7 +56,7 @@ const runRefund = async (interaction) => {
         buyLog({arguments, error});
         await interaction.reply(error);
         return;
-    } else if (amount > place.Buildings[index][level]) {
+    } else if (amount > (place.Buildings[index][level] ?? 0)) {
         error = "Not enough buildings";
         buyLog({arguments, error});
         await interaction.reply(error);

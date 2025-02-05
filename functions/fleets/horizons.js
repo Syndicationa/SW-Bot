@@ -1,24 +1,23 @@
-const { getSolarDate } = require("../dateWork");
-const { locations } = require("./travel");
-const date = getSolarDate();
-
 const address = (command, center = 0, date = [2024, 3, 26]) => 
     `https://ssd.jpl.nasa.gov/api/horizons.api?` 
     + `command='${command}'`
-    + `&CENTER='g@${center}'`
+    + `&CENTER='@${center}'`
     + `&ephem_type='VECTORS'`
     + `&VEC_TABLE='4'`
     + `&TLIST='${date.join("-")}'`
 ;
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const getLocation = async (location, date) => {
+    if (location === "0") return [0,0,0];
     let requestPlanet = await fetch(address(location, 0, date));
     
+    let i = 0;
     while (requestPlanet.status !== 200) {
-        sleep(1000);
+        await sleep(500);
         requestPlanet = await fetch(address(location, 0, date));
+        console.log(++i, address(location, 0, date));
     }
 
     const planetString = (await requestPlanet.json()).result;
@@ -31,24 +30,38 @@ const getLocation = async (location, date) => {
     return [x, y, z];
 }
 
-const distance = ([x1, y1, z1], [x2, y2, z2]) =>  Math.sqrt((x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2) / 299792.458;
+module.exports = {getLocation};
 
-module.exports = {getLocation, distance};
+// const test = "8:15|178|0";
+// const a = async () => {
+//     const test = toStrCoord(await getLocation(locations.titan, date));
+//     const result = toStrCoord(fromStrCoord(test));
+//     const result2 = toStrCoord(fromStrCoord(result));
 
-const make2Digits = (i) => i < 10 ? `0${i}`: `${i}`;
+//     console.log(test, result, result2);
+// }
+// a()
 
-// const moons = async () => {
+// const make2Digits = (i) => i < 10 ? `0${i}`: `${i}`;
+
+// const planets = async () => {
 //     console.log("\nNearest Planets\n")
 
-//     const names = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn"]
-//     const moons = [locations.mercury, locations.venus, locations.earth, locations.mars, locations.jupiter, locations.saturn];
-//     const positions = await Promise.all(moons.map(async (id) => await getLocation(id, date)));
+//     const names = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Pluto"]
+//     const planets = [locations.mercury, locations.venus, locations.earth, locations.mars, locations.jupiter, locations.pluto];
+//     const positions = await Promise.all(planets.map(async (id) => await getLocation(id, date)));
+
+//     positions.forEach((v, i) => {
+//         console.log(`${names[i]}: ${toStrCoord(v)}`);
+//     })
+
+//     console.log("\n");
 
 //     const map = new Map();
 //     let longestName = 0;
 
-//     for (let i = 0; i < moons.length - 1; i++) {
-//         for (let j = i + 1; j < moons.length; j++) {
+//     for (let i = 0; i < planets.length - 1; i++) {
+//         for (let j = i + 1; j < planets.length; j++) {
 //             const dist = distance(positions[i], positions[j]);
 
 //             const time = dist*5;
@@ -79,6 +92,8 @@ const make2Digits = (i) => i < 10 ? `0${i}`: `${i}`;
 //     console.log("\n\n");
 // }
 
+// planets();
+
 // const test = async () => {
 //     console.log(date.join("/"));
 //     const response = await fetch(address(locations.mimas, locations.enceladus, date));
@@ -105,6 +120,3 @@ const make2Digits = (i) => i < 10 ? `0${i}`: `${i}`;
 
 //     console.log(str);
 // }
-
-
-// moons();

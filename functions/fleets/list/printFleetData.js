@@ -30,11 +30,11 @@ const singleFleet = (fleet) => {
 }
 
 const singleVehicle = (vehicle, factionDatas) => {
-    const {faction, count, id} = vehicle;
+    const {faction, count, ID} = vehicle;
 
-    const name = factionDatas[faction].Vehicles[id].name;
+    const name = factionDatas[faction].Vehicles[ID].name;
 
-    return `${name.slice(0,12).padEnd(14)}|${("" + count).slice(0,8).padStart(10)}${faction}`
+    return `${name.slice(0,12).padEnd(14)}|${("" + count).slice(0,8).padStart(10)} ${faction}`
 }
 
 const listFleets = (fleets) => {

@@ -121,4 +121,4 @@ const register = async (server, faction, name, vehicleData, cost, domain) => {
     return true
 }
 
-module.exports = { registrationController };
+module.exports = { registrationController, register };

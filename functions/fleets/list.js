@@ -54,7 +54,7 @@ const select = (listState, print) => (interaction) => {
     listState.state = "Single";
     listState.fleetPage = page;
     listState.selectedFleet = offsets[page] + selectedOnPage;
-    listState.setup(listState);
+    listState.setup(listState, print);
 
     interaction.update(print())
 }

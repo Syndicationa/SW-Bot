@@ -79,12 +79,14 @@ const calculateUnrefinedIncome = (faction) => {
 }
 
 const calculateRefinedIncome = (faction, trades, name) => {
-    const {Resources, Capacities, Usages, Storage: store} = faction;
-    const CSCost = Resources.Population/50000;
+    const {Resources, Capacities, Usages, Storage: store, Fleets} = faction;
+    const CSCost = Resources.Population/50000 + Fleets.reduce((a, f) => a + f.CSCost,0);
 
-    const orderedTrades = trades.reduce((group, trade) => group[trade.ID] = trade,[]);
+    const orderedTrades = new Map();
+    trades.forEach((trade) => orderedTrades.set(trade.ID, trade),[]);
+    
     const storage = 
-        faction.Trades.map(id => orderedTrades[id] ?? false).filter(trade => Boolean(trade))
+        faction.Trades.map(id => orderedTrades.get(id) ?? false).filter(trade => Boolean(trade))
             .map((trade) => {
                 return trade[name].Resources;
             })
@@ -153,7 +155,7 @@ const trade = (factionGroup, resources) => {
             factionData.Trades
                 .map(id => trades[id] ?? false).filter(trade => Boolean(trade))
                 .map(trade => {
-                    const target = Object.keys(trade).filter(key => key !== 'ID' || key === name)[0];
+                    const target = Object.keys(trade).filter(key => key !== 'ID' && key !== name)[0];
                     return {
                         ID: trade.ID,
                         ...trade[name],
@@ -181,7 +183,7 @@ const trade = (factionGroup, resources) => {
         processing = false;
         for (let name in data) {
             const faction = data[name];
-            for (let trade of faction.Trades) {
+            for (const trade of faction.Trades) {
                 if (trade.Resolved) continue;
                 const target = data[trade.Target];
                 
@@ -215,6 +217,7 @@ const trade = (factionGroup, resources) => {
 
     //Recompile Factions
     for (let trade of trades) {
+        if (!trade) continue;
         const [factionA, factionB] = Object.keys(trade).filter(key => key !== 'ID')
         const factionADebt = data[factionA].Trades.find(a => a.ID === trade.ID).Debt;
         const factionBDebt = data[factionB].Trades.find(b => b.ID === trade.ID).Debt;

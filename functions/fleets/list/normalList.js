@@ -5,6 +5,13 @@ const inputs = [
     {name: "faction", description: "Faction", type: "String", required: true}
 ];
 
+const updatePage = (listState, print) => (interaction, pageNumber, buttons) => {
+    listState.page = pageNumber;
+    listState.pageButtons = buttons;
+
+    interaction.update(print())
+}
+
 const singleListButtons = (back) => [
     {
         action: "button",
@@ -17,7 +24,7 @@ const singleListButtons = (back) => [
     },
 ]
 
-const setupSingleFleetList = (listState) => {
+const setupSingleFleetList = (listState, print) => {
     const {fleetData, factionDatas, selectedFleet, vehiclePages} = listState;
 
     listState.single = listVehicles(fleetData[selectedFleet], factionDatas);
