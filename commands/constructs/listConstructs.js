@@ -27,16 +27,9 @@ const runListConstructs = async (interaction) => {
             (build, i) => 
                 `ID: ${i} ${build.name} @ ${handleReturnMultiple(buildingCost(factionData, i), undefined, ", ")}`
         ).join("\n ");
-    const vehicles = 
-        factionData.Vehicles.map(
-            (vehicle, i) => 
-                `ID: ${i} ${vehicle.name} @ ${handleReturnMultiple(vehicle.cost, undefined, ", ")}`
-        ).join("\n ");
-
-    console.log(vehicles)
 
     await interaction.reply(
-    `${faction} has \nBuildings: \`\`\` ${buildings}\`\`\` \nVehicles: \`\`\` ${vehicles}\`\`\``);
+    `${faction} has \nBuildings: \`\`\` ${buildings}\`\`\``);
 }
 
 const command = new SlashCommandBuilder().setName('list').setDescription('List a faction\'s buildings and vehicles');
