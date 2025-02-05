@@ -1,6 +1,7 @@
 const commandBuilder = require("../../functions/discord/commandBuilder");
 const { splitCurrency, resourceArrayToObject } = require('../../functions/currency');
 const { registrationController } = require('../../functions/rating/register');
+const {handleReturnMultiple, handleReturn } = require('../../functions/currency');
 
 const name = "ship-rate";
 const description = "Rate Spacecraft";
@@ -26,6 +27,7 @@ const inputs = [
     {name: "drone", description: "Is a drone", type: "Boolean", required: false, default: false},
     {name: "other", description: "Other Costs", type: "Integer", required: false, default: 0},
 
+    {name: "boat", description: "Boat", type: "Boolean", required: false, default: false},
 	{name: "name", description: "Name", type: "String", required: false, default: "ship"},
 	{name: "faction", description: "Faction", type: "String", required: false},
 ]
@@ -164,11 +166,13 @@ const spaceRate = (data) => {
             throw "How did you manage this?";
     }
 
+    const multiplier = data.boat ? 0.85 : 1;
+
     return {
-        ER: Math.ceil(er(data)*1000000000),
-        CM: Math.ceil(cm(data)),
-        CS: Math.ceil(cs(data)),
-        EL: Math.ceil(el(data))
+        ER: Math.ceil(er(data)*1000000000*multiplier),
+        CM: Math.ceil(cm(data)*multiplier),
+        CS: Math.ceil(cs(data)*multiplier),
+        EL: Math.ceil(el(data)*multiplier)
     }
 }
 
@@ -180,9 +184,12 @@ const rate = (interaction, inputs) => {
 
     vehicleData.engines = resourceArrayToObject(vehicleData.engines);
 
-    const str = `The ${name} will cost about $${cost.ER} ER, ${cost.CM} CM, ${cost.EL} EL, and ${cost.CS} CS. It will have an upkeep of ${Math.ceil(cost.CS/6)} CS.`;
+    const str = `The ${name} will cost about ${handleReturnMultiple(cost, undefined, ", ")} CS. It will have an upkeep of ${handleReturn(Math.ceil(cost.CS/6))} CS.`;
 
-    registrationController(interaction, faction, name, vehicleData, cost, "Space", str);
+    if (vehicleData.boat)
+        registrationController(interaction, faction, name, vehicleData, cost, "Sea", str);
+    else
+        registrationController(interaction, faction, name, vehicleData, cost, "Space", str);
 }
 
 module.exports = commandBuilder(command, rate);
