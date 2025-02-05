@@ -9,12 +9,15 @@ const { countBuildings, scaleResources, maxResources, subResources, equResources
 const { getFactionStats } = require('../../functions/income');
 
 const buyLog = log('buy')
-
 const sumCT = (c, t) => (t*(t+1)-c*(c+1))/2;
 
-const countBelowLevel = (building = {}, level) => {
+const countBelowLevel = (buildings = {}, level) => {
     let sum = 0;
-    for (let x = 0; x < level; x++) sum += building[x] ?? 0;
+
+    for (let x = 0; x < level; x++) {
+        sum += buildings[x] ?? 0;
+    }
+        
     console.log(sum);
     return sum;
 };
@@ -24,12 +27,15 @@ const inputs = [
     {name: "index", description: "Building to be bought", type: "Integer", required: true},
     {name: "location", description: "Where to build the building", type: "String", required: true},
     {name: "level", description: "Level to upgrade to", type: "Integer", required: true},
+    {name: "upgrade_count", description: "Number of buildings to upgrade", type: "Integer", required: false}
 ]
 
-const runBuy = async (interaction) => {
+const runUpgrade = async (interaction) => {
     const arguments = retrieveInputs(interaction.options, inputs);
-    const {faction, index, location, level: lvl} = arguments;
+    const {faction, index, location, level: lvl, num_upgrade} = arguments;
     const level = lvl - 1;
+    const count = num_upgrade ?? 1;
+
     const server = interaction.guild.name;
     let error = "";
 
@@ -37,6 +43,7 @@ const runBuy = async (interaction) => {
     const factionData = await getFaction(server, faction);
     const place = factionData?.Maps[location];
     const buildings = place?.Buildings[index];
+
     if (factionData === undefined) {
         error = 'Faction not found';
         buyLog({arguments, error});
@@ -62,7 +69,14 @@ const runBuy = async (interaction) => {
         buyLog({arguments, error});
         await interaction.reply(error);
         return;
-    } else if (level <= 0 || level > 9) {
+    }
+    else if ((count > buildings[level]) || count > countBuildings(buildings)) {
+        error = "Not enough buildings to upgrade";
+        buyLog({arguments, error});
+        await interaction.reply(error);
+        return;
+    }
+    else if (level <= 0 || level > 9) {
         error = "Cannot upgrade to that level";
         buyLog({arguments, error});
         await interaction.reply(error);
@@ -72,6 +86,9 @@ const runBuy = async (interaction) => {
     const originalLevel = Number(Object.keys(buildings).filter(str => Number(str) < level && buildings[str] > 0).reverse()[0]);
 
     const costs = roundResources(scaleResources(factionData.Buildings[index].cost, sumCT(originalLevel, level)));
+    costs.array.forEach(element => {
+        element *= count;
+    });
 
     const NaNCosts = Object.keys(costs).some((res) => isNaN(costs[res]));
     if (NaNCosts || costs === undefined) {
@@ -98,8 +115,8 @@ const runBuy = async (interaction) => {
 
     const newBuilding = {
         ...buildings,
-        [originalLevel]: buildings[originalLevel] - 1,
-        [level]: (buildings[level] ?? 0) + 1
+        [originalLevel]: buildings[originalLevel] - count,
+        [level]: (buildings[level] ?? 0) + count
     }
 
     const newBuildings = place.Buildings;
@@ -119,9 +136,19 @@ const runBuy = async (interaction) => {
     const stats = getFactionStats(settings, tFaction);
 
     setFaction(server, faction, {Resources: {...resources, ...newResources}, Maps: newMaps, ...stats});
-    await interaction.reply(
-        `${faction} has upgraded a lvl ${originalLevel + 1} ${factionData.Buildings[index].name} to lvl ${level + 1} for ${handleReturnMultiple(costs, settings.Resources)}`
-    );
+
+    if (count > 1) {
+        await interaction.reply(
+            `${faction} has upgraded ${count} lvl ${originalLevel + 1} ${factionData.Buildings[index].name} to lvl ${level + 1} for ${handleReturnMultiple(costs, settings.Resources)}`
+        );
+    } else if (count === 1) {
+        await interaction.reply(
+            `${faction} has upgraded a lvl ${originalLevel + 1} ${factionData.Buildings[index].name} to lvl ${level + 1} for ${handleReturnMultiple(costs, settings.Resources)}`
+        );
+    }
+
+
+    
 }
 
 const command = new SlashCommandBuilder().setName('upgrade-building').setDescription('Upgrade Building');
@@ -129,7 +156,7 @@ generateInputs(command, inputs);
 
 const buy = {
     data: command,
-    execute: runBuy
+    execute: runUpgrade
 }
 
 module.exports = buy;
