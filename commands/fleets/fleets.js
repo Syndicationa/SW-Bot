@@ -4,6 +4,7 @@ const { inputs: createInputs, createFleet } = require("../../functions/fleets/cr
 const { list } = require("../../functions/fleets/list");
 const { inputs: listInputs } = require("../../functions/fleets/list/normalList");
 const { inputs: renameInputs, ...rename } = require("../../functions/fleets/list/rename");
+const { inputs: actionInputs, ...action } = require("../../functions/fleets/list/action");
 
 const name = "fleet";
 const description = "For testing a new style of rating";
@@ -27,6 +28,12 @@ const inputs = [
         type: "Subcommand",
         options: renameInputs,
     },
+    {
+        name: "state",
+        description: "Change fleet state",
+        type: "Subcommand",
+        options: actionInputs
+    }
 ]
 
 const command = {name, description, inputs};
@@ -46,6 +53,9 @@ const fleets = async (interaction, inputs) => {
             break;
         case "rename":
             [resultStr, components, allComponents] = await list(server, inputs, rename);
+            break;
+        case "state":
+            [resultStr, components, allComponents] = await list(server, inputs, action);
             break;
         default:
             resultStr = "Not accepted Input"

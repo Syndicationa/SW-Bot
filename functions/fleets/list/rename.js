@@ -15,7 +15,7 @@ const handleInputs = (listState, inputs) => {
     
     let IDNumber = Math.round(Number(id));
     if (isNaN(IDNumber)) {
-        IDNumber = fleets.find((fleet) => fleet.Name.toLowerCase() === id.toLowerCase());
+        IDNumber = fleets.findIndex((fleet) => fleet.Name.toLowerCase() === id.toLowerCase());
     } else {
         IDNumber--;
     }
@@ -40,7 +40,7 @@ const rename =  (listState) => (interaction, collector) => {
     interaction.update({
         content: `You have renamed ${oldName} to ${name}`,
         components: []
-    }) //There may be a conflict
+    })
 }
 
 const renameButtons = (back, listState) => [
