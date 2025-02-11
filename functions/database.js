@@ -7,14 +7,20 @@ let database;
 
 const getDatabase = async () => {
     const collections = await db.listCollections();
-    const data = collections.map((c) => c.id).reduce(async (acc, val) => {
+    const database = {};
+    
+    await Promise.all(collections.map((c) => c.id).map(async (val) => {
         const databaseInfo = await db.collection(val).get()
         const data = {}
         databaseInfo.forEach((faction) => data[faction.id] = faction.data());
-        return {...acc, [val]: data}
-    },{})
+        
+        database[val] = data;
+
+        return 0;
+    }));
+
     console.log("Retrieved Database")
-    return data;
+    return database;
 }
 
 const setDatabase = async () => database = await getDatabase();
