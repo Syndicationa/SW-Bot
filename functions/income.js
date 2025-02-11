@@ -23,6 +23,7 @@ const getFactionStats = (settings, faction) => {
 };
 
 const income = async (server) => {
+    if (!isNaN(Number(server))) return;
     console.log(`Performing Income: ${server}`)
     const factionData = getFactions(server);
 
@@ -44,7 +45,7 @@ const income = async (server) => {
     objectMap(newFactionData, (data, faction) => {
         if (faction === "settings") return;
         if (faction === "data") setFaction(server, faction, {...data, date: newTimestamp});
-        else setFaction(server, faction, data);
+        // else setFaction(server, faction, data);
         return;
     })
 }
