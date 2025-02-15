@@ -18,7 +18,8 @@ const inputs = [
     {name: "medium", description: "Medium Armament, includes cannons up to 99mm, short range missiles", type: "Integer", required: false, default: 0},
     {name: "light", description: "Light Armament, includes machine guns, grenade launchers up to 40mm", type: "Integer", required: false, default: 0},
     {name: "rocket", description: "Rocket Armament, unguided rockets up to 130mm caliber", type: "Integer", required: false, default: 0},
-    {name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
+    {name: "shield", description: "Shield", type: "Boolean", required: false, default: 0},
+	{name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
     
 	{name: "name", description: "Name", type: "String", required: false, default: 'vehicle'},
 	{name: "faction", description: "Faction", type: "String", required: false},
@@ -53,14 +54,15 @@ const er = (values) => {
     const mediumCostER = medium*0.3;
     const lightCostER = light*0.03;
     const rocketCostER = rocket*0.08;
+    const shieldCostER = shield ? 1 : 0;
 
     const systemCostER = 1 + systems*0.1 + protectionCosts[protection].ER;
 
-    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER)*100)/100;
+    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER + shieldCostER)*100)/100;
 }
 
 const cm = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
     const lengthCostCM = length**2 / 8.5 + armorCosts[armor].CM + protectionCosts[protection].CM;
     
@@ -68,14 +70,15 @@ const cm = (values) => {
     const mediumCostCM = medium*2;
     const lightCostCM = light*0.3;
     const rocketCostCM = rocket;
+	const shieldCostCM = shield ? 5 : 0;
 
     const systemCostCM = systems + 1;
 
-    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM)*20)/100;
+    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM + shieldCostCM)*20)/100;
 }
 
 const el = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
     const lengthCostEL = 3*(length**2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
     
@@ -85,8 +88,9 @@ const el = (values) => {
     const rocketCostEL = rocket*0.2;
 
     const systemCostEL = systems*1.5 + 1;
-
-    return Math.ceil(systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*20)/100;
+	
+	const finalEL = shield ? systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*1.1 + 30 : systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)
+    return Math.ceil(finalEL*20)/100;
 }
 
 const cs = (values, costCM, costEL) => {
