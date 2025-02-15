@@ -42,7 +42,7 @@ const protectionCosts = { //Not inverted
 }
 
 const er = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, systems, shield} = values;
 
     const weaponSystemCost = 
         (heavy > 0) ? 7 :
