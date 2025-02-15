@@ -113,7 +113,7 @@ const { getFactionStats } = require('./income');
 const { scaleResources } = require("./resourceMath");
 const { split } = require('./functions');
 
-const file = "./database/database36.txt"
+const file = "./database/database43.txt"
 
 const run = async () => {
     await setDatabase();
@@ -216,6 +216,6 @@ const saveToDatabase = async () => {
     console.log("Hopefully done!")
 }
 
-// run();
+run();
 // addData();
 // saveToDatabase();
