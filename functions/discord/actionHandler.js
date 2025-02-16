@@ -142,7 +142,9 @@ const componentCollector = (components, time, shutdown = () => {}, filter = () =
         componentMap.get(i.customId)(i, collector)
     });
 
-    collector.once("end", shutdown);
+    collector.once("end", (collection, reason) => {
+        if (reason === 'time') shutdown(collection, reason)
+    });
 }
 
 module.exports = { generateRow, componentSingleUse, componentCollector };
