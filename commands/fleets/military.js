@@ -19,15 +19,6 @@ const inputs = [
 ]
 
 const runrecruit = async (interaction) => {
-    const arguments = retrieveInputs(interaction.options, inputs);
-    const {faction, process, amount, individual_cost, time, name} = arguments;
-    const server = interaction.guild.name;
-    let error = "";
-
-    const settings = await getFaction(server, "Settings");
-	const fix = amount + " Military";
-	const newAmount = splitCurrency(fix);
-	
     const factionData = await getFaction(server, faction);
     if (factionData === undefined) {
         error = 'Faction not found';
@@ -46,71 +37,48 @@ const runrecruit = async (interaction) => {
         await interaction.reply(error);
         return;
     }
-	
-	const resources = factionData.Resources;
+    
+    const resources = factionData.Resources;
     const newResources = {};
-	
-	
+    
+    costs.forEach(async (cost) => {
+            const [amount, resourceName] = cost;
+            
+            const nVal = resources[resourceName] - ( process == "dimiss" ? 0 : amount * newAmount[0][0]);
+            
+            if (nVal < 0) {
+                error = 'Not enough funds';
+                buyLog({arguments, error});
+                await interaction.reply(error);
+                return;
+            }
+            newResources[resourceName] = nVal;
+            
+        })
 
-	
-	
-	
-	
-	
-	
+        if (Object.keys(newResources).length !== Object.keys(costs).length) return;
 
-	const name1 = "Military";
-	const name2 = "Population";
-	if (process === "recruit") {
-		const nValarmy = resources[name1] + newAmount[0][0];
-		const nValpop = resources[name2] - newAmount[0][0];
-		console.log(newAmount);
-		console.log(newAmount[0][0]);
-		if (nValarmy < 0 || nValpop < 0) {
-			error = 'Your military/population cannot be bellow 0';
-			recruitLog({arguments, error});
-			await interaction.reply(error);
-			return;
-		}
-		
-		newResources[name1] = nValarmy;
-		newResources[name2] = nValpop;
-		
-		costs.forEach(async (cost) => {
-			const [amount, resourceName] = cost;
-			
-			const nVal = resources[resourceName] - amount * newAmount[0][0];
-			
-			if (nVal < 0) {
-				error = 'Not enough funds';
-				buyLog({arguments, error});
-				await interaction.reply(error);
-				return;
-			}
-			newResources[resourceName] = nVal;
-			
-		})
-
-		if (Object.keys(newResources).length !== Object.keys(costs).length) return;
-		
-	} else if (process === "dimiss") {
-		const nValarmy = resources[name1] - newAmount[0][0];
-		const nValpop = resources[name2] + newAmount[0][0];
-		if (nValarmy < 0 || nValpop < 0) {
-			error = 'Your military/population cannot be bellow 0';
-			recruitLog({arguments, error});
-			await interaction.reply(error);
-			return;
-		}
-		
-		newResources[name1] = nValarmy;
-		newResources[name2] = nValpop;
-	} else {
-		error = 'Error in process, must be "recruit" or "dimiss"';
-		recruitLog({arguments, error});
-		await interaction.reply(error);
-		return;
-	}
+    
+    
+    const name1 = "Military";
+    const name2 = "Population";
+    if (process === "recruit") {
+        const nValarmy = resources[name1] + newAmount[0][0];
+        const nValpop = resources[name2] - newAmount[0][0];
+        console.log(newAmount);
+        console.log(newAmount[0][0]);
+        if (nValarmy < 0 || nValpop < 0) {
+            error = 'Your military/population cannot be below 0';
+            recruitLog({arguments, error});
+            await interaction.reply(error);
+            return;
+        }
+        
+        newResources[name1] = nValarmy;
+        newResources[name2] = nValpop;
+        
+        
+    }
     setFaction(server, faction, {Resources: {...resources, ...newResources}});
 	const embed = new EmbedBuilder().setTitle(`${faction}'s military`).setColor(0x0099FF).setTimestamp().setDescription(
 		`${faction} successfully ${process}ed ${newAmount[0][0]} ${name} for $${individual_cost} each.\nThey'll be ready in ${time}.\n1 irl week ~~ 3 irp months`);
