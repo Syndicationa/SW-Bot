@@ -27,6 +27,8 @@ const runrecruit = async (interaction) => {
     const settings = await getFaction(server, "Settings");
 	const fix = amount + " Military";
 	const newAmount = splitCurrency(fix);
+	console.log(newAmount);
+	console.log(newAmount[0][0]);
 	
     const factionData = await getFaction(server, faction);
     if (factionData === undefined) {
@@ -50,15 +52,25 @@ const runrecruit = async (interaction) => {
 	const resources = factionData.Resources;
     const newResources = {};
 	
-	
+	costs.forEach(async (cost) => {
+			const [amount, resourceName] = cost;
+			
+			const nVal = resources[resourceName] - ( process == "dimiss" ? 0 : amount * newAmount[0][0]);
+			
+			if (nVal < 0) {
+				error = 'Not enough funds';
+				buyLog({arguments, error});
+				await interaction.reply(error);
+				return;
+			}
+			newResources[resourceName] = nVal;
+			
+		})
+
+		if (Object.keys(newResources).length !== Object.keys(costs).length) return;
 
 	
 	
-	
-	
-	
-	
-
 	const name1 = "Military";
 	const name2 = "Population";
 	if (process === "recruit") {
@@ -76,22 +88,6 @@ const runrecruit = async (interaction) => {
 		newResources[name1] = nValarmy;
 		newResources[name2] = nValpop;
 		
-		costs.forEach(async (cost) => {
-			const [amount, resourceName] = cost;
-			
-			const nVal = resources[resourceName] - amount * newAmount[0][0];
-			
-			if (nVal < 0) {
-				error = 'Not enough funds';
-				buyLog({arguments, error});
-				await interaction.reply(error);
-				return;
-			}
-			newResources[resourceName] = nVal;
-			
-		})
-
-		if (Object.keys(newResources).length !== Object.keys(costs).length) return;
 		
 	} else if (process === "dimiss") {
 		const nValarmy = resources[name1] - newAmount[0][0];
