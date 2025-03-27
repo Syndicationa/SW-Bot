@@ -32,7 +32,7 @@ const singleFleet = (fleet) => {
 const singleVehicle = (vehicle, factionDatas) => {
     const {faction, count, ID} = vehicle;
 
-    const name = factionDatas[faction].Vehicles[ID].name;
+    const name = factionDatas[faction].Vehicles.find((item) => item.ID === ID).name;
 
     return `${name.slice(0,12).padEnd(14)}|${("" + count).slice(0,8).padStart(10)} ${faction}`
 }

@@ -23,6 +23,7 @@ const getFactionStats = (settings, faction) => {
 };
 
 const income = async (server) => {
+    if (!isNaN(Number(server))) return;
     console.log(`Performing Income: ${server}`)
     const factionData = getFactions(server);
 

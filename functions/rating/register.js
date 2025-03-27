@@ -2,6 +2,7 @@ const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction} = require("../../functions/database");
 const { generateNextID } = require('../../functions/fleets/group');
 const { generateRow, componentSingleUse } = require('../discord/actionHandler');
+const { findIndex } = require('../../buildings');
 
 const domains = [
     {label: "Space", value: "Space", emoji: false, default: false},
@@ -62,10 +63,18 @@ const registrationController = async (interaction, faction, name, vehicleData, c
 
     const server = interaction.guild.name;
 
+    const factionData = await getFaction(server, faction);
+    if (factionData === undefined) {
+        interaction.reply({content: str, components: []});
+        return;
+    }
+
+    const replaceIdx = factionData.Vehicles.findIndex(veh => veh.name === name);
+
     const success = async (i) => {
         try {
-            const success = await register(server, faction, name, vehicleData, cost, domain);
-            if (!success) throw "How did you do this?";
+            const success = await register(server, faction, factionData, name, vehicleData, cost, domain, replaceIdx);
+            if (success === 'fail') throw "How did you do this?";
 
             i.update({
                 content: `${faction} has registered the ${name}`,
@@ -83,7 +92,7 @@ const registrationController = async (interaction, faction, name, vehicleData, c
     const controls = registerCancelRow(success, cancel(str));
 
     const response = await interaction.reply({
-        content: str + `\nDo you want to register the ${name} class into ${faction}?`,
+        content: str + `\nDo you want to ${replaceIdx >= 0 ? 'reregister':'register'} the ${name} class into ${faction}?`,
         components: [generateRow(controls)]
     });
 
@@ -94,13 +103,23 @@ const registrationController = async (interaction, faction, name, vehicleData, c
     
 }
 
-const register = async (server, faction, name, vehicleData, cost, domain) => {
-    const factionData = await getFaction(server, faction);
-    if (factionData === undefined) throw "Faction not found!";
+const register = async (server, faction, factionData, name, vehicleData, cost, domain, replaceIdx) => {
+    
     
     const now = new Date();
     const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
     const newTimestamp = Timestamp.fromDate(new Date(today));
+
+    if (typeof replaceIdx === 'number' && replaceIdx >= 0) {
+        const vehicle = factionData.Vehicles[replaceIdx];
+        vehicle.cost = cost;
+        vehicle.domain = domain;
+        vehicle.data = vehicleData;
+
+        setFaction(server, faction, factionData)
+
+        return 'reregister'
+    }
 
     const newID = generateNextID(factionData.Vehicles);
 
@@ -118,7 +137,7 @@ const register = async (server, faction, name, vehicleData, cost, domain) => {
 
     setFaction(server, faction, {Vehicles: newVehicles});
 
-    return true
+    return 'register'
 }
 
 module.exports = { registrationController, register };

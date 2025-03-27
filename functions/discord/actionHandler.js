@@ -139,10 +139,13 @@ const componentCollector = (components, time, shutdown = () => {}, filter = () =
     const collector = response.createMessageComponentCollector({filter, time})
 
     collector.on("collect", async i => {
+        console.log(Object.keys(i));
         componentMap.get(i.customId)(i, collector)
     });
 
-    collector.once("end", shutdown);
+    collector.once("end", (collection, reason) => {
+        if (reason === 'time') shutdown(collection, reason)
+    });
 }
 
 module.exports = { generateRow, componentSingleUse, componentCollector };

@@ -42,7 +42,7 @@ const protectionCosts = { //Not inverted
 }
 
 const er = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, systems, shield} = values;
 
     const weaponSystemCost = 
         (heavy > 0) ? 7 :
@@ -70,7 +70,7 @@ const cm = (values) => {
     const mediumCostCM = medium*2;
     const lightCostCM = light*0.3;
     const rocketCostCM = rocket;
-	const shieldCostCM = shield ? 5 : 0;
+    const shieldCostCM = shield ? 25 : 0;
 
     const systemCostCM = systems + 1;
 
@@ -88,8 +88,8 @@ const el = (values) => {
     const rocketCostEL = rocket*0.2;
 
     const systemCostEL = systems*1.5 + 1;
-	
-	const finalEL = shield ? systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*1.1 + 30 : systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)
+    
+    const finalEL = shield ? systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*1.1 + 150 : systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)
     return Math.ceil(finalEL*20)/100;
 }
 

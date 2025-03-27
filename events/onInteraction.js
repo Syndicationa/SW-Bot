@@ -1,6 +1,6 @@
 const { Events, MessageFlags } = require('discord.js');
 
-const lagMode = false;
+const lagMode = true;
 
 const onInteraction = async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
