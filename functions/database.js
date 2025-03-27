@@ -113,7 +113,7 @@ const { getFactionStats } = require('./income');
 const { scaleResources } = require("./resourceMath");
 const { split } = require('./functions');
 
-const file = "./database/database44.txt"
+const file = "./database/database46.txt"
 
 const run = async () => {
     await setDatabase();

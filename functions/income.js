@@ -45,7 +45,7 @@ const income = async (server) => {
     objectMap(newFactionData, (data, faction) => {
         if (faction === "settings") return;
         if (faction === "data") setFaction(server, faction, {...data, date: newTimestamp});
-        // else setFaction(server, faction, data);
+        else setFaction(server, faction, data);
         return;
     })
 }

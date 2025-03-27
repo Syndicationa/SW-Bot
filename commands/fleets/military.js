@@ -19,7 +19,11 @@ const inputs = [
 ]
 
 const runrecruit = async (interaction) => {
+	const {faction, process, amount: newAmount, individual_cost, time, name} = retrieveInputs(interaction.options, inputs);
+	const server = interaction.guild.name;
+
     const factionData = await getFaction(server, faction);
+    const settings = await getFaction(server, 'settings');
     if (factionData === undefined) {
         error = 'Faction not found';
         recruitLog({arguments, error});

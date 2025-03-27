@@ -139,6 +139,7 @@ const componentCollector = (components, time, shutdown = () => {}, filter = () =
     const collector = response.createMessageComponentCollector({filter, time})
 
     collector.on("collect", async i => {
+        console.log(Object.keys(i));
         componentMap.get(i.customId)(i, collector)
     });
 

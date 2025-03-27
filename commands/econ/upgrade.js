@@ -57,7 +57,7 @@ const runBuy = async (interaction) => {
         buyLog({arguments, error});
         await interaction.reply(error);
         return;
-    } else if (buildings === undefined || countBelowLevel(buildings, level) === 0) {
+    } else if (buildings === undefined || buildings === null || countBelowLevel(buildings, level) === 0) {
         error = "No upgradable buildings";
         buyLog({arguments, error});
         await interaction.reply(error);

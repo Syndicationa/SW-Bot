@@ -1,3 +1,4 @@
+
 const { defaultResources } = require('./currency');
 const { objectReduce, objectMap, split, objectFilter } = require('./functions');
 const { subResources, validResources, minResources, addResources, mulResources, roundResources, economicCountBuildings, scaleResources, equResources, isEmpty, countBuildings, maxResources } = require('./resourceMath');
@@ -127,12 +128,13 @@ const calculateUniqueIncome = (faction) => {
 
 const fastTrade = (faction, trades, name) => {
     const orderedTrades = [];
-    trades.forEach((rade) => orderedTrades[trade.ID] = trade);
+    trades.forEach((trade) => orderedTrades[trade.ID] = trade);
 
     const resources = 
         faction.Trades.map(id => orderedTrades[id] ?? false).filter(trade => Boolean(trade))
             .map((trade) => {
                 const target = Object.keys(trade).filter(key => key !== 'ID' || key === name)[0];
+                console.log(target);
                 return subResources(trade[target].Resources, trade[name].Resources);
             })
             .reduce((acc, trade) => addResources(acc, trade), faction.Resources)
@@ -290,7 +292,7 @@ const performIncome = (factionGroup) => {
 }
 
 const calculateIncome = (faction, trades, name, doTrades) => {
-    const tradedFaction = doTrades ? fastTrade(faction, trades, name): faction;
+    const tradedFaction = doTrades ? fastTrade(faction, trades, name.toLowerCase()): faction;
 
     const unrefinedFaction = {
         ...tradedFaction,
