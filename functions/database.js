@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const { db } = require('../firebase');
-const { minResources, maxResources, addResources, subResources, validResources} = require('./resourceMath');
+const { minResources, maxResources, addResources, subResources, validResources, divResources} = require('./resourceMath');
 const { calculateIncome } = require('./incomeMath');
 
 let database;
@@ -111,9 +111,9 @@ const buildings = require("../buildings");
 const { Timestamp } = require('firebase-admin/firestore');
 const { getFactionStats } = require('./income');
 const { scaleResources } = require("./resourceMath");
-const { split } = require('./functions');
+const { split, objectReduce, objectMap } = require('./functions');
 
-const file = "./database/database46.txt"
+const file = "./database/database47.txt"
 
 const run = async () => {
     await setDatabase();
@@ -155,6 +155,27 @@ const saveToDatabase = async () => {
     // console.log(resourceObject);
 
     for (const server in database) {
+        // if (server !== 'The Solar Wars') continue;
+        // let runningSum = defaultResources(['ER', 'CM', 'CS', 'EL', 'U-CM', 'U-CS', 'U-EL']);
+        // let isActive = new Set();
+
+        // for (const faction in database[server]) {
+        //     if (faction === 'settings' || faction === 'data') continue;
+
+        //     if (!('Maps' in database[server][faction])) continue;
+
+        //     const land = objectReduce(database[server][faction].Maps, (a, map) => a + map.Hexes, 0) > 0;
+
+        //     if (!land) continue;
+        //     isActive.add(faction);
+        //     runningSum = addResources(runningSum, database[server][faction].Resources);
+        // }
+
+        // console.log(runningSum);
+        // runningSum = scaleResources(runningSum, 1/(isActive.size));
+        // runningSum = objectMap(runningSum, (i) => Math.floor(i));
+        // console.log(runningSum);
+
         for (const faction in database[server]) {
             const data = database[server][faction]
 
