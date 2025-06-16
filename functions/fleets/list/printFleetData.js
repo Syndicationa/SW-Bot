@@ -1,3 +1,5 @@
+const { handleReturnMultiple } = require("../../currency");
+
 const singleFleet = (fleet) => {
     const {Name, Vehicles, State, CSCost} = fleet;
 
@@ -66,7 +68,7 @@ const listFleets = (fleets) => {
 }
 
 const listVehicles = (fleet, factionDatas) => {
-    const {Name, State, CSCost, Vehicles} = fleet;
+    const {Name, State, CSCost, Vehicles, Value} = fleet;
 
     let status = "Status: ";
     switch (State.Action) {
@@ -93,6 +95,7 @@ const listVehicles = (fleet, factionDatas) => {
             throw 'Errorenous fleet state';
     }
 
+    const price = `Valued: ${handleReturnMultiple(Value, undefined, ", ")}`;
     const consuming = `Consuming ${CSCost} CS`
     const tableMessage = `Class          Count      Faction`;
     const tableLine = "-".repeat(tableMessage.length);
@@ -103,7 +106,7 @@ const listVehicles = (fleet, factionDatas) => {
     
     let page = pages[0];
 
-    const intro = [Name + " ", status, consuming, tableMessage, tableLine].join("\n");
+    const intro = [Name + " ", status, price, consuming, tableMessage, tableLine].join("\n");
     charCount = intro.length;
 
     for (const str of fleetStrs) {

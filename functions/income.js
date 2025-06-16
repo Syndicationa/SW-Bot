@@ -5,7 +5,7 @@ const { calculateIncome, calculateCapacities, performIncome } = require('./incom
 const { addResources, maxResources, minResources } = require('./resourceMath');
 const { objectMap } = require('./functions');
 
-const incomePeriod = (5 * 24 * 60 * 60 * 1000);
+const incomePeriod = (7 * 24 * 60 * 60 * 1000);
 
 const updateDate = (LastUpdated = new Date()) => {
 	const today = new Date();

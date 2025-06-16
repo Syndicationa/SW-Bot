@@ -17,7 +17,7 @@ const inputs = [
     {name: "trade", description: "Include Trades", type: "Boolean", required: false, default: true}
 ]
 
-const incomePeriod = (5 * 24 * 60 * 60 * 1000);
+const incomePeriod = (7 * 24 * 60 * 60 * 1000);
 
 
 const runIncome = async (interaction) => {
