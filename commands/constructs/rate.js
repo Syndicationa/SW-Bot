@@ -100,7 +100,7 @@ const el = (values) => {
         shield, stealth, 
         systems, engines, ftl, 
         cargo, drone, other} = values;
-        const ftlModifier = ftl === "None" ? 0 : (ftl === "INT" ? 20 : 10);  
+        const ftlModifier = ftl === "NONE" ? 0 : (ftl === "INT" ? 20 : 10);  
     const lCost = length*((stealth ? 10: 0) + ftlModifier);
     
     const mCost = main*100;

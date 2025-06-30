@@ -95,7 +95,7 @@ const listVehicles = (fleet, factionDatas) => {
             throw 'Errorenous fleet state';
     }
 
-    const price = `Valued: ${handleReturnMultiple(Value, undefined, ", ")}`;
+    const price = Vehicles.length === 0 ? "I am going to shoot you!": `Valued: ${handleReturnMultiple(Value, undefined, ", ")}`;
     const consuming = `Consuming ${CSCost} CS`
     const tableMessage = `Class          Count      Faction`;
     const tableLine = "-".repeat(tableMessage.length);

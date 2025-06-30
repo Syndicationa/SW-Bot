@@ -36,7 +36,7 @@ const createFactionRole = async (interaction, faction, roleName, color, leader) 
 
     const name = roleName ?? faction;
     try {
-        const role = interaction.guild.roles.create({
+        const role = await interaction.guild.roles.create({
             name,
             color: color,
             position: locationNumber,
