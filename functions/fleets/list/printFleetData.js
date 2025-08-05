@@ -13,6 +13,8 @@ const singleFleet = (fleet) => {
 
         case "Defense":
         case "Battle":
+        case "Idle":
+        case "Patrol":
             stateStr = `Location: ${State.Location}`;
             break;
 
@@ -25,7 +27,7 @@ const singleFleet = (fleet) => {
             break;
 
         default:
-            throw 'Errorenous fleet state';
+            throw `Errorenous fleet state: ${State.Action}`;
     }
 
     return Name.slice(0,12).padEnd(14) + State.Action.padEnd(12) + stateStr;
@@ -91,8 +93,16 @@ const listVehicles = (fleet, factionDatas) => {
             stateStr = `Mothballed around ${State.Location}. Mothballed since ${State.Start}`;
             break;
 
+        case "Idle":
+            stateStr = `Will be killing Fer at ${State.Location}`;
+            break;
+
+        case "Patrol":
+            stateStr = `Patrolling around ${State.Location} to find Syn before she destroys them`
+            break;
+
         default:
-            throw 'Errorenous fleet state';
+            throw `Errorenous fleet state: ${State.Action}`;
     }
 
     const price = Vehicles.length === 0 ? "I am going to shoot you!": `Valued: ${handleReturnMultiple(Value, undefined, ", ")}`;
