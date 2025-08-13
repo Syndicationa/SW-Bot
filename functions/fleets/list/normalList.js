@@ -34,7 +34,7 @@ const setupSingleFleetList = (listState, print) => {
 const singleFleetPrint = (listState) => {
     const { page, single: [vehicleIntro, vehiclePages], singleButtons, pageButtons } = listState;
 
-    return [vehicleIntro + "\n" + vehiclePages[page].join("\n"), [singleButtons, pageButtons]];
+    return [vehicleIntro + "\n" + vehiclePages[0].join("\n"), [singleButtons, pageButtons]];
 }
 
 module.exports = {
