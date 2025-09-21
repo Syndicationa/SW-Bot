@@ -108,7 +108,7 @@ const generateRow = (rowComponents) => {
     return row;
 }
 
-const componentCollector = (components, time) => response => {
+const componentSingleUse = (components, time, shutdown = () => {}, filter = () => true) => async response => {
     const componentMap = new Map();
 
     components.forEach(component => {
@@ -116,11 +116,36 @@ const componentCollector = (components, time) => response => {
         componentMap.set(component.id, component.function);
     });
 
-    const collector = response.createMessageComponentCollector({time})
+    const collector = response.createMessageComponentCollector({filter, time})
 
-    collector.on("collect", async i => {
+    collector.once("collect", async i => {
         componentMap.get(i.customId)(i, collector)
+        collector.stop("Recieved input");
+    });
+
+    collector.once("end", (collection, reason) => {
+        if (reason === 'time') shutdown();
     });
 }
 
-module.exports = { generateRow, componentCollector };
+const componentCollector = (components, time, shutdown = () => {}, filter = () => true) => response => {
+    const componentMap = new Map();
+
+    components.forEach(component => {
+        if (!("id" in component)) return;
+        componentMap.set(component.id, component.function);
+    });
+
+    const collector = response.createMessageComponentCollector({filter, time})
+
+    collector.on("collect", async i => {
+        console.log(Object.keys(i));
+        componentMap.get(i.customId)(i, collector)
+    });
+
+    collector.once("end", (collection, reason) => {
+        if (reason === 'time') shutdown(collection, reason)
+    });
+}
+
+module.exports = { generateRow, componentSingleUse, componentCollector };

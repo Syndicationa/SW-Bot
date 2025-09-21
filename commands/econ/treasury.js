@@ -24,7 +24,7 @@ const treasury = {
         let message = "";
         if (interaction.user.username === "mwrazer") {
             message = "I see you Razer"
-        } else if (interaction.user.username === "obscureranger") {
+        } else if (interaction.user.username === "obscurecharcoal") {
             message = "No blood sacrifices"
         }
         const {faction} = retrieveInputs(interaction.options, inputs);

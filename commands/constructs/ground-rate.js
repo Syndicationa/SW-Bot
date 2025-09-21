@@ -1,5 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
-const {generateInputs, retrieveInputs} = require('../../functions/discord/optionHandler');
+const commandBuilder = require("../../functions/discord/commandBuilder");
+const { splitCurrency, resourceArrayToObject } = require('../../functions/currency');
+const { registrationController } = require('../../functions/rating/register');
+
+const name = "ground-rate";
+const description = "Rate Ground Vehicles (no trains, sorry)";
 
 const inputs = [
     {name: "length", description: "Length of vehicle", type: "Number", required: true},
@@ -14,12 +18,14 @@ const inputs = [
     {name: "medium", description: "Medium Armament, includes cannons up to 99mm, short range missiles", type: "Integer", required: false, default: 0},
     {name: "light", description: "Light Armament, includes machine guns, grenade launchers up to 40mm", type: "Integer", required: false, default: 0},
     {name: "rocket", description: "Rocket Armament, unguided rockets up to 130mm caliber", type: "Integer", required: false, default: 0},
-    {name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
+    {name: "shield", description: "Shield", type: "Boolean", required: false, default: 0},
+	{name: "systems", description: "Systems", type: "Integer", required: false, default: 0},
+    
 	{name: "name", description: "Name", type: "String", required: false, default: 'vehicle'},
+	{name: "faction", description: "Faction", type: "String", required: false},
 ]
 
-const command = new SlashCommandBuilder().setName('ground-rate').setDescription('Rate Ground Vehicles (no trains, sorry)');
-generateInputs(command, inputs);
+const command = {name, description, inputs};
 
 const armorCosts = { //Costs are seemingly inverted
     heavy: {ER: 24, CM: 90, EL: 30, CS: 40},
@@ -36,7 +42,7 @@ const protectionCosts = { //Not inverted
 }
 
 const er = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, systems, shield} = values;
 
     const weaponSystemCost = 
         (heavy > 0) ? 7 :
@@ -48,14 +54,15 @@ const er = (values) => {
     const mediumCostER = medium*0.3;
     const lightCostER = light*0.03;
     const rocketCostER = rocket*0.08;
+    const shieldCostER = shield ? 1 : 0;
 
     const systemCostER = 1 + systems*0.1 + protectionCosts[protection].ER;
 
-    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER)*100)/100;
+    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER + shieldCostER)*100)/100;
 }
 
 const cm = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
     const lengthCostCM = length**2 / 8.5 + armorCosts[armor].CM + protectionCosts[protection].CM;
     
@@ -63,14 +70,15 @@ const cm = (values) => {
     const mediumCostCM = medium*2;
     const lightCostCM = light*0.3;
     const rocketCostCM = rocket;
+    const shieldCostCM = shield ? 25 : 0;
 
     const systemCostCM = systems + 1;
 
-    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM)*20)/100;
+    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM + shieldCostCM)*20)/100;
 }
 
 const el = (values) => {
-    const {length, armor, protection, heavy, medium, light, rocket, systems} = values;
+    const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
     const lengthCostEL = 3*(length**2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
     
@@ -80,8 +88,9 @@ const el = (values) => {
     const rocketCostEL = rocket*0.2;
 
     const systemCostEL = systems*1.5 + 1;
-
-    return Math.ceil(systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*20)/100;
+    
+    const finalEL = shield ? systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*1.1 + 150 : systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)
+    return Math.ceil(finalEL*20)/100;
 }
 
 const cs = (values, costCM, costEL) => {
@@ -102,43 +111,26 @@ const cs = (values, costCM, costEL) => {
     return Math.ceil((lengthCostCS + systemCostCS + 0.1*(costCM + costEL))*20)/100;
 }
 
-const rateFunction = (values) => {
-    const {name} = values;
-    
-    // const correctedArmor = armor ?? "none";
-    // const correctedProtection = protection ?? "none"
+const groundRate = (values) => {
+    const costCM = cm(values);
+    const costEL = el(values);
 
-    // const correctedHeavy = heavy ?? 0;
-    // const correctedMedium = medium ?? 0;
-    // const correctedLight = light ?? 0;
-    // const correctedRocket = rocket ?? 0;
-
-    // const correctedSystems = systems ?? 0;
-
-
-    // const correctedValues = {
-    //     length, 
-    //     armor: correctedArmor,
-    //     protection: correctedProtection, 
-    //     heavy: correctedHeavy,
-    //     medium: correctedMedium,
-    //     light: correctedLight,
-    //     rocket: correctedRocket,
-    //     systems: correctedSystems,
-    // }
-
-    const costCM = cm(values)
-    const costEL = el(values)
-
-    return `The ${name} will cost about $${er(values)} million ER, ${Math.ceil(costCM)} CM, ${Math.ceil(costEL)} EL, and ${Math.ceil(cs(values, costCM, costEL))} CS. It will have an upkeep of ${Math.ceil(cs(values, costCM, costEL)/6)} CS.`
+    return {
+        ER: Math.ceil(er(values)*1000000),
+        CM: Math.ceil(costCM),
+        CS: Math.ceil(cs(values, costCM, costEL)),
+        EL: Math.ceil(costEL)
+    }
 } 
 
-const ground = {
-    data: command,
-    execute: async (interaction) => {
-        const values = retrieveInputs(interaction.options, inputs);
-        await interaction.reply(rateFunction(values));
-    }
+const rate = (interaction, inputs) => {
+    const {faction, name, ...vehicleData} = inputs;
+
+    const cost = groundRate(vehicleData);
+    
+    const str = `The ${name} will cost about $${cost.ER} ER, ${cost.CM} CM, ${cost.EL} EL, and ${cost.CS} CS. It will have an upkeep of ${Math.ceil(cost.CS/6)} CS.`;
+    
+    registrationController(interaction, faction, name, vehicleData, cost, "Ground", str);
 }
 
-module.exports = ground;
+module.exports = commandBuilder(command, rate);

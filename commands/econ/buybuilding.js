@@ -47,7 +47,7 @@ const runBuy = async (interaction) => {
         buyLog({arguments, error});
         await interaction.reply(error);
         return;
-    } else if (place.Hexes < place.Buildings.reduce((a, b) => a + countBuildings(b), 0)) {
+    } else if (place.Hexes < place.Buildings.reduce((a, b) => a + countBuildings(b), 0) + amount) {
         error = "Not enough hexes";
         buyLog({arguments, error});
         await interaction.reply(error);

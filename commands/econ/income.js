@@ -4,7 +4,7 @@ const { Timestamp } = require('firebase-admin/firestore');
 const {getFaction, setFaction, getFactionNames} = require("../../functions/database");
 const { db } = require('../../firebase');
 const { log } = require('../../functions/log');
-const {handleReturnMultiple } = require('../../functions/currency');
+const {handleReturnMultiple, handleReturn } = require('../../functions/currency');
 const {objectMap} = require('../../functions/functions');
 const { calculateIncome } = require('../../functions/incomeMath');
 const { equResources } = require('../../functions/resourceMath');
@@ -17,7 +17,7 @@ const inputs = [
     {name: "trade", description: "Include Trades", type: "Boolean", required: false, default: true}
 ]
 
-const incomePeriod = (5 * 24 * 60 * 60 * 1000);
+const incomePeriod = (7 * 24 * 60 * 60 * 1000);
 
 
 const runIncome = async (interaction) => {
@@ -63,15 +63,16 @@ const runIncome = async (interaction) => {
     const trades = data.Trades.Active;
 
     const income = calculateIncome(factionData, trades, faction, trade);
-    console.log(income);
 
     const lastDate = data.date.toDate();
     const nextDate = new Date(lastDate.getTime() + incomePeriod);
 
+    const totalCS = factionData.Fleets.reduce((a, fleet) => a + fleet.CSCost, 0)
+
     await interaction.reply(
         `${faction} claimed income on ${lastDate.getUTCFullYear()}/${lastDate.getUTCMonth()+1}/${lastDate.getUTCDate()}, 
         will claim on ${nextDate.getUTCFullYear()}/${nextDate.getUTCMonth()+1}/${nextDate.getUTCDate()}, 
-        and will claim ${handleReturnMultiple(income, undefined, ", ")}`
+        and will claim ${handleReturnMultiple(income, undefined, ", ")}. Your fleets consume ${handleReturn(totalCS)} CS`
     );
 }
 

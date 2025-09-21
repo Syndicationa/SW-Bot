@@ -57,12 +57,12 @@ const runconquer = async (interaction) => {
     };
 	
 	const newEMaps = {
-        ...factionData.Maps, 
+        ...enemyData.Maps, 
         [place]: {
             Buildings: [],
             Fleets: [],
-            ...(factionData.Maps[place] ?? {}),
-            Hexes: (factionData.Maps[place]?.Hexes ?? 0) - count,
+            ...(enemyData.Maps[place] ?? {}),
+            Hexes: (enemyData.Maps[place]?.Hexes ?? 0) - count,
         }
     };
 

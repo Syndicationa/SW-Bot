@@ -47,7 +47,7 @@ const runClaim = async (interaction) => {
     }
 
     const resources = factionData.Resources;
-	const newResources = subResources(resources, {Influence: count*20})
+	const newResources = subResources(resources, {Influence: Math.abs(count*20)})
     if (newResources.Influence < 0) {
         error = 'Not enough Influence';
         claimLog({arguments, error});

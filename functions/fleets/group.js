@@ -1,12 +1,4 @@
-const { addResources, scaleResources } = require("./resourceMath");
-
-const exampleVehicle = {
-    ID: 0,
-    date: new Date(), 
-    name: "NAME", 
-    cost: {}, 
-    count: 0
-}
+const { addResources, scaleResources } = require("../resourceMath");
 
 const states = [
     {Action: "Move", Source: "Place", Destination: "Place2", Start: new Date(), End: new Date()},
@@ -17,8 +9,10 @@ const states = [
 ];
 
 const exampleGroup = {
+    Name: "Example",
     ID: 0,
-    Vehicles: [{Faction: "name", Count: 0, ID: 1}],
+    Type: "Space",
+    Vehicles: [{faction: "name", count: 0, ID: 1}],
     State: states[0],
     Value: {},
     CSCost: 0
@@ -28,9 +22,15 @@ const getFactions = (group) => {
     return Array.from(new Set(group.Vehicles.map(vehicle => vehicle.faction)));
 }
 
+const buildVehicleMap = (vehicleArr, map, faction) => {
+    for (const vehicle of vehicleArr) {
+        map.set(`${faction.toLowerCase()}<>${vehicle.ID}`, vehicle);
+    }
+}
+
 const calculateValue = (vehicles = new Map(), group) => {
-    const cost = group.Vehicles.reduce((acc, {Count, Faction, ID}) => {
-        return addResources(scaleResources(vehicles.get([Faction, ID]).Cost, Count), acc)
+    const cost = group.Vehicles.reduce((acc, {count, faction, ID}) => {
+        return addResources(scaleResources(vehicles.get(`${faction}<>${ID}`).cost, count), acc)
     }, {});
 
     return cost;
@@ -39,20 +39,38 @@ const calculateValue = (vehicles = new Map(), group) => {
 const valueGroup = (vehicles, group) => {
     const cost = calculateValue(vehicles, group);
 
-    return {
-        ...group,
-        Value: cost,
-        CSCost: Math.ceil(cost.CS * (group.State.Action === "Mothballed") ? 0.05:0.2),
-    }
+    group.Value = cost;
+
+    return updateCSCost(group);
 }
 
-const makeAGroup = (ID, location) => {
+const updateCSCost = (group) => {
+    const action = group.State.Action;
+    const CS = group.Value?.CS ?? 0
+
+    let scale = 1/6;
+    switch (action) {
+        case "Mothballed":
+            scale *= 0.25;
+            break;
+        case "Activating":
+            break;
+        default:
+    }
+
+    group.CSCost = Math.ceil(CS * scale);
+    return group;
+}
+
+const makeAGroup = (name, ID, type, location) => {
     return {
+        Name: name,
         ID,
+        Type: type,
         Vehicles: [],
         State: {Action: "Defense", Location: location},
-        Value: -1,
-        CSCost: -1
+        Value: null,
+        CSCost: 0
     }
 }
 
@@ -81,13 +99,15 @@ const validTransfer = (source, target) => {
 };
 
 const addVehicleToMap = (map = new Map()) => (vehicle) => {
-    map.set([vehicle.Faction, vehicle.ID], vehicle.Count)
+    map.set(`${vehicle.faction}<>${vehicle.ID}`, vehicle.count)
 }
 
 const createVehicleArray = (map = new Map()) => {
     let arr = [];
-    for (const [[Faction, ID], Count] of map) {
-        arr.push({Faction, ID, Count});
+    for (const [data, count] of map) {
+        const [faction, numberStr] = data.split("<>");
+        const ID = Number(numberStr);
+        arr.push({faction, ID, count});
     }
     return arr;
 }
@@ -96,14 +116,16 @@ const addVehicles = (target, vehicles) => {;
     const targetMap = new Map();
     const transferMap = new Map();
 
-    target.forEach(addVehicleToMap(targetMap));
+    target.Vehicles.forEach(addVehicleToMap(targetMap));
     vehicles.forEach(addVehicleToMap(transferMap));
     
     for (const [key, count] of transferMap) {
-        targetMap.set(key, count + (target.get(key) ?? 0));
+        targetMap.set(key, count + (targetMap.get(key) ?? 0));
     }
 
-    return {...target, Vehicles: createVehicleArray(targetMap)};
+    target.Vehicles = createVehicleArray(targetMap);
+
+    return target;
 }
 
 const transferVehicles = (source, target, vehicles) => {
@@ -112,21 +134,21 @@ const transferVehicles = (source, target, vehicles) => {
     const targetMap = new Map();
     const transferMap = new Map();
 
-    source.forEach(addVehicleToMap(sourceMap));
-    target.forEach(addVehicleToMap(targetMap));
+    source.Vehicles.forEach(addVehicleToMap(sourceMap));
+    target.Vehicles.forEach(addVehicleToMap(targetMap));
     vehicles.forEach(addVehicleToMap(transferMap));
     
     for (const [key, count] of transferMap) {
         if (!sourceMap.has(key)) throw Error("Vehicle to tranfer is missing");
-        sourceMap.set(key, count + source.get(key));
-        targetMap.set(key, count + (target.get(key) ?? 0));
+        sourceMap.set(key, count - sourceMap.get(key));
+        targetMap.set(key, count + (targetMap.get(key) ?? 0));
     }
 
     return [{...source, Vehicles: createVehicleArray(sourceMap)}, {...target, Vehicles: createVehicleArray(targetMap)}];
 }
 
 const generateNextID = (list) => {
-    const sorted = list.sort((a, b) => a.ID - b.ID);
+    const sorted = list.toSorted((a, b) => a.ID - b.ID);
     
     for (let i = 0; i < sorted.length; i++)
         if (i < sorted[i].ID) return i;
@@ -135,4 +157,4 @@ const generateNextID = (list) => {
 
 const findGroup = (list = [exampleGroup], ID) => list.find(group => group.ID === ID);
 
-module.exports = {states, getFactions, valueGroup, makeAGroup, addVehicles, transferVehicles, generateNextID, findGroup};
+module.exports = {states, getFactions, buildVehicleMap, valueGroup, updateCSCost, makeAGroup, addVehicles, transferVehicles, generateNextID, findGroup};

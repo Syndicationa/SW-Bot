@@ -1,25 +1,28 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {generateInputs, retrieveInputs} = require('../../functions/discord/optionHandler');
 const { Timestamp } = require('firebase-admin/firestore');
-const {getFaction, setFaction} = require("../../functions/database");
+const {getFaction} = require("../../functions/database");
 const { log } = require('../../functions/log');
 const { splitCurrency } = require('../../functions/currency');
-const { generateNextID } = require('../../functions/fleets');
+const { register } = require('../../functions/rating/register');
 
 const regVLog = log('registerVehicle');
 
 const inputs = [
     {name: "faction", description: "Faction", type: "String", required: true},
     {name: "name", description: "Vehicle Name", type: "String", required: true},
-    {name: "cost", description: "Cost of the Vehcile", type: "String", required: true},
-    {name: "year", description: "Date of creation", type: "Integer", required: true},
-    {name: "month", description: "Date of creation", type: "Integer", required: true},
-    {name: "day", description: "Date of creation", type: "Integer", required: true},
-    {name: "count", description: "Starting Count", type: "Integer", required: false, default: 0}
+    {name: "cost", description: "Cost of the vehicle", type: "String", required: true},
+    {name: "domain", description: "Domain of the Vehicle", type: "String", required: true, 
+        choices: [
+            {name: "Fighter", value: "Fighter"},
+            {name: "Air", value: "Air"},
+            
+            {name: "Space Fighter|Air", value: "Fighter|Air"},
+        ]},
 ]
 
 const runRegisterVehicle = async (interaction) => {
-    const {faction, name, cost, year, month, day, count} = retrieveInputs(interaction.options, inputs);
+    const {faction, name, cost, domain} = retrieveInputs(interaction.options, inputs);
     const server = interaction.guild.name;
 
     const settings = await getFaction(server, "settings");
@@ -61,14 +64,10 @@ const runRegisterVehicle = async (interaction) => {
         calcCosts[resourceName] = nVal;
     })
 
-    const newID = generateNextID(factionData.Vehicles);
+    const res = await register(server, faction, name, "Needs to be replaced", calcCosts, domain);
 
-    const newVehicles = [
-        ...factionData.Vehicles,
-        {date: newTimestamp, name, cost: calcCosts, count: count, ID: newID}
-    ]
+    if (!res) throw "How!";
 
-    setFaction(server, faction, {Vehicles: newVehicles});
     await interaction.reply(`${faction} has added the ${name} to its arsenal`);
 }
 

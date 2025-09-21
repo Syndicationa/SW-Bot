@@ -30,13 +30,20 @@ const typeFunction = type => {
         case "Mentionable":
             return (c,f) => c.addMentionableOption(f) 
         case "Attachment":
-            return (c,f) => c.addAttachmentOption(f) 
+            return (c,f) => c.addAttachmentOption(f)
+        case "Subcommand":
+            return (c,f) => c.addSubcommand(f)
     }
 }
 
 const optionFunction = (data = exampleInputs[0]) => option => {
-    option.setName(data.name).setDescription(data.description).setRequired(data.required)
-    if (Array.isArray(data.choices)) option.addChoices(...data.choices)
+    if (data.name) option.setName(data.name);
+    if (data.description) option.setDescription(data.description);
+    if (data.required) option.setRequired(data.required);
+
+    if (Array.isArray(data.options)) generateInputs(option, data.options);
+    if (Array.isArray(data.choices)) option.addChoices(...data.choices);
+    
     return option;
 };
 
@@ -46,34 +53,48 @@ const generateInputs = (command, inputArray = exampleInputs) => {
     })
 }
 
-const retrieveFunction = (input = exampleInputs) => {
+const retrieveFunction = (input = exampleInputs[0]) => {
+    //Subcommands are handled separately
     switch (input.type) {
         case "String":
-            return (option, name) => option.getString(name) ?? input.default
+            return (option) => option.getString(input.name) ?? input.default
         case "Integer":
-            return (option, name) => option.getInteger(name) ?? input.default
+            return (option) => option.getInteger(input.name) ?? input.default
         case "Number":
-            return (option, name) => option.getNumber(name) ?? input.default
+            return (option) => option.getNumber(input.name) ?? input.default
         case "Boolean":
-            return (option, name) => option.getBoolean(name) ?? input.default
+            return (option) => option.getBoolean(input.name) ?? input.default
         case "User":
-            return (option, name) => option.getUser(name) ?? input.default
+            return (option) => option.getUser(input.name) ?? input.default
         case "Channel":
-            return (option, name) => option.getChannel(name) ?? input.default
+            return (option) => option.getChannel(input.name) ?? input.default
         case "Role":
-            return (option, name) => option.getRole(name) ?? input.default
+            return (option) => option.getRole(input.name) ?? input.default
         case "Mentionable":
-            return (option, name) => option.getMentionable(name) ?? input.default
+            return (option) => option.getMentionable(input.name) ?? input.default
         case "Attachment":
-            return (option, name) => option.getAttachment(name) ?? input.default
+            return (option) => option.getAttachment(input.name) ?? input.default
     }
 }
 
 const retrieveInputs = (options, inputArray = exampleInputs) => {
     let output = {};
     inputArray.forEach((input) => {
-        const data = retrieveFunction(input)(options, input.name);
-        if (data !== null) output = {...output, [input.name]: data};
+        if (input.type === "Subcommand") {
+            if (options.getSubcommand() !== input.name) return;
+
+            output = {...output, ...retrieveInputs(options, input.options)};
+            
+            if (output.Subcommand) output.Subcommand = `${input.name}/${output.Subcommand}`;
+            else output.Subcommand = input.name;
+            
+            return;
+        }
+
+        const data = retrieveFunction(input)(options);
+        if (data !== null) 
+            if (input.type === "Subcommand") output = {...output, ...data, Subcommand: input.name};
+            else output[input.name] = data;
     })
     return output;
 }

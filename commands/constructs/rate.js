@@ -1,32 +1,38 @@
-const { SlashCommandBuilder } = require('discord.js');
-const {generateInputs, retrieveInputs} = require('../../functions/discord/optionHandler');
-const { splitCurrency } = require('../../functions/currency');
+const commandBuilder = require("../../functions/discord/commandBuilder");
+const { splitCurrency, resourceArrayToObject } = require('../../functions/currency');
+const { registrationController } = require('../../functions/rating/register');
+const {handleReturnMultiple, handleReturn } = require('../../functions/currency');
+
+const name = "ship-rate";
+const description = "Rate Spacecraft";
 
 const inputs = [
     {name: "length", description: "Length of the Ship", type: "Number", required: true},
 
-    {name: "main", description: "Primary Weapon Count", type: "Integer", required: false},
-    {name: "secondary", description: "Secondary Weapon Count", type: "Integer", required: false},
-    {name: "lances", description: "Lance-like Weapon Count", type: "Integer", required: false},
-    {name: "pdc", description: "PDC-like Weapon Count", type: "Integer", required: false},
-    {name: "torpedoes", description: "Torpedo/Missile Count", type: "Integer", required: false},
+    {name: "main", description: "Primary Weapon Count", type: "Integer", required: false, default: 0},
+    {name: "secondary", description: "Secondary Weapon Count", type: "Integer", required: false, default: 0},
+    {name: "lances", description: "Lance-like Weapon Count", type: "Integer", required: false, default: 0},
+    {name: "pdc", description: "PDC-like Weapon Count", type: "Integer", required: false, default: 0},
+    {name: "torpedoes", description: "Torpedo/Missile Count", type: "Integer", required: false, default: 0},
 
-    {name: "shield", description: "Has a Shield", type: "Boolean", required: false},
-    {name: "stealth", description: "Has Stealth", type: "Boolean", required: false},
-	{name: "systems", description: "Additional systems", type: "Integer", required: false},
+    {name: "shield", description: "Has a Shield", type: "Boolean", required: false, default: false},
+    {name: "stealth", description: "Has Stealth", type: "Boolean", required: false, default: false},
+	{name: "systems", description: "Additional systems", type: "Integer", required: false, default: 0},
 
 	{name: "engines", description: "4S 2M 1L", type: "String", required: false},
-    {name: "ftl", description: "Specify type of FTL", type: "String", required: false, 
+    {name: "ftl", description: "Specify type of FTL", type: "String", required: false, default: "NONE",
         choices: [{name: "External", value: "EXT"}, {name: "Internal", value: "INT"}, {name: "None", value: "NONE"}]},
 
-    {name: "cargo", description: "Amount of cargo space (1 unit per meter)", type: "Integer", required: false},
-    {name: "drone", description: "Is a drone", type: "Boolean", required: false},
-    {name: "other", description: "Other Costs", type: "Integer", required: false},
-	{name: "name", description: "Name", type: "String", required: false, default: 'ship'},
+    {name: "cargo", description: "Amount of cargo space (1 unit per meter)", type: "Integer", required: false, default: 0},
+    {name: "drone", description: "Is a drone", type: "Boolean", required: false, default: false},
+    {name: "other", description: "Other Costs", type: "Integer", required: false, default: 0},
+
+    {name: "boat", description: "Boat", type: "Boolean", required: false, default: false},
+	{name: "name", description: "Name", type: "String", required: false, default: "ship"},
+	{name: "faction", description: "Faction", type: "String", required: false},
 ]
 
-const command = new SlashCommandBuilder().setName('ship-rate').setDescription('Rate Spacecraft');
-generateInputs(command, inputs);
+const command = {name, description, inputs};
 
 const er = (values) => {
     const {
@@ -94,7 +100,7 @@ const el = (values) => {
         shield, stealth, 
         systems, engines, ftl, 
         cargo, drone, other} = values;
-        const ftlModifier = ftl === "None" ? 0 : (ftl === "INT" ? 20 : 10);  
+        const ftlModifier = ftl === "NONE" ? 0 : (ftl === "INT" ? 20 : 10);  
     const lCost = length*((stealth ? 10: 0) + ftlModifier);
     
     const mCost = main*100;
@@ -141,57 +147,49 @@ const cs = (values) => {
     return (lCost + mCost + seCost + lanCost + pCost + sysCost + engineCost)*droneDiscount;
 }
 
-const rateFunction = (values) => {
-    const {
-        length, main, secondary, 
-        lances, pdc, torpedoes, 
-        shield, stealth, 
-        systems, engines, ftl, 
-        cargo, drone, other, name} = values;
-    
-    const correctedFTL = ftl ?? "NONE";
-    const correctedStealth = stealth ?? false
-    const correctedMain = main ?? 0;
-    const correctedSecondary = secondary ?? 0;
-    const correctedLances = lances ?? 0;
-    const correctedPDCs = pdc ?? 0;
-    const correctedTorpedoes = torpedoes ?? 0;
-    
-    const correctedOther = other ?? 0;
-    const correctedShields = shield ?? false;
-	const correctedSystems = systems ?? 0;
+const spaceRate = (data) => {
+    switch (typeof data.engines) {
+        case "string":
+            data.engines = splitCurrency(data.engines ?? "0", "M");
+            break;
+        case "object":
+            if (Array.isArray(data.engines)) break;
+            const newArray = [];
 
-    const correctedCargo = cargo ?? 0;
-    const correctedDrone = drone ?? false;
+            for (const size in data.engines) {
+                newArray.push([data.engines[size], size]);
+            }
 
-    const correctedEngines = splitCurrency(engines ?? "0", "M");
-
-    const correctedValues = {
-        length,
-        main: correctedMain,
-        secondary: correctedSecondary,
-        lances: correctedLances,
-        pdc: correctedPDCs,
-        torpedoes: correctedTorpedoes,
-        shield: correctedShields,
-        stealth: correctedStealth,
-        systems: correctedSystems,
-        engines: correctedEngines,
-        ftl: correctedFTL,
-        cargo: correctedCargo,
-        drone: correctedDrone,
-        other: correctedOther,
+            inputs.engines = newArray;
+            break;
+        default: 
+            throw "How did you manage this?";
     }
 
-    return `The ${name} will cost about $${er(correctedValues)} billion ER, ${Math.ceil(cm(correctedValues))} CM, ${Math.ceil(el(correctedValues))} EL, and ${Math.ceil(cs((correctedValues)))} CS. It will have an upkeep of ${Math.ceil(cs((correctedValues))/6)} CS.`
-}
+    const multiplier = data.boat ? 0.85 : 1;
 
-const rate = {
-    data: command,
-    execute: async (interaction) => {
-        const values = retrieveInputs(interaction.options, inputs);
-        await interaction.reply(rateFunction(values));
+    return {
+        ER: Math.ceil(er(data)*1000000000*multiplier),
+        CM: Math.ceil(cm(data)*multiplier),
+        CS: Math.ceil(cs(data)*multiplier),
+        EL: Math.ceil(el(data)*multiplier)
     }
 }
 
-module.exports = rate;
+const rate = (interaction, inputs) => {
+    const {faction, name, ...vehicleData} = inputs;
+    vehicleData.engines = splitCurrency(vehicleData.engines ?? "0", "M");
+
+    const cost = spaceRate(vehicleData);
+
+    vehicleData.engines = resourceArrayToObject(vehicleData.engines);
+
+    const str = `The ${name} will cost about ${handleReturnMultiple(cost, undefined, ", ")} CS. It will have an upkeep of ${handleReturn(Math.ceil(cost.CS/6))} CS.`;
+
+    if (vehicleData.boat)
+        registrationController(interaction, faction, name, vehicleData, cost, "Sea", str);
+    else
+        registrationController(interaction, faction, name, vehicleData, cost, "Space", str);
+}
+
+module.exports = commandBuilder(command, rate);
